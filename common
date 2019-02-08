@@ -1,0 +1,40 @@
+#
+# Allowable VLANs and names
+# names will be entered as a synonym for an accessport
+# so "vlan 25 foo" will also do "alias foo a25"
+#
+# For the aliases it is case insensitive
+#
+
+vlanbase 30
+
+vlan 0 DMZ
+vlan 1 SCORING
+vlan 2 WBF
+vlan 3 LOCAL
+vlan 4 GUEST
+vlan 5 VG
+vlan 6 SECUR
+vlan 7 MARIO
+vlan 8 SPARE2
+vlan 9 SPARE3
+
+adminvlan 2
+network 10.100.201
+
+alias trunk t0-9,u2
+alias asatrunk t0-4
+
+spanningtree off
+
+#
+# All types of hardware supported
+# parameters are number of fast(100Mbps) and gig(1000Mbps) ports
+#
+type sg300-sf 0 10 layer3
+type sg300-52 0 52 layer3
+type sf300-24 24 4 layer3
+type sf302-08 8 2 layer3
+type sf302-08mpp 8 2 layer3
+type sg200-26 0 26 layer2
+type sg200-08 0 8 layer2simple

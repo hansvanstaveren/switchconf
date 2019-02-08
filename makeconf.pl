@@ -1,7 +1,39 @@
-# kop commentaar zonder betekenis, test git
-
 no warnings "experimental::smartmatch";
 use feature ':5.10';
+
+$file_common = "common";
+$file_devices = "devices";
+$file_credentials = "credentials";
+
+$dir_conf = "conf";
+$dir_text = "txt";
+
+$credentials_set = 0;
+$username = "admin";
+$password = "admin";
+
+sub getset_credentials {
+    my ($fname) = @_;
+
+    if (open(CRDFILE, "<:crlf", "$fname")) {
+	while (<CRDFILE>) {
+	    chomp;
+	    s/\s*#.*//;
+	    next if /^$/;
+
+	    my ($keyw, @rest) = split;
+
+	    if ($keyw eq "credentials") {
+		$credentials_set = 1;
+		$username = $rest[0];
+		$password = $rest[1];
+		next;
+	    }
+	    die "$keyw not recognized in $fname";
+	}
+	close CRDFILE;
+    }
+}
 
 #
 # Make config for one switch
@@ -14,9 +46,9 @@ sub onefile {
     # input in a .cnf, output in a .txt
     my $ifile = $dev_conf{$hostname};
     $fname = "$ifile.cnf";
-    open(CNFFILE, $fname) || die "Cannot open $fname";
+    open(CNFFILE, "<:crlf", "$dir_conf/$fname") || die "Cannot open $fname";
     $outfile = "$hostname.txt";
-    open(OUTFILE, ">", $outfile) || die "Cannot create $outfile";
+    open(OUTFILE, ">", "$dir_text/$outfile") || die "Cannot create $outfile";
     # No extra CR in output, even on Windows/DOS
     binmode OUTFILE;
 
@@ -86,6 +118,7 @@ sub onefile {
 		    }
 		    $let = "a";
 		}
+		print "let=$let, low=$low, high=$high\n";
 
 		for ($low..$high) {
 		    die "vlan $_ does not exist" unless defined($vlan_name{$_});
@@ -295,7 +328,7 @@ EXIT
 NETWORK
 ENDTEMPLATE
 
-open(COMMON, "common") || die;
+open(COMMON, "<:crlf", $file_common) || die "Cannot open \"$file_common\"";
 while(<COMMON>) {
     chomp;
     s/\s*#.*//;
@@ -348,6 +381,7 @@ while(<COMMON>) {
 	next;
     }
     if ($keyw eq "credentials") {
+	$credentials_set = 1;
 	$username = $rest[0];
 	$password = $rest[1];
 	next;
@@ -356,7 +390,9 @@ while(<COMMON>) {
 }
 close COMMON;
 
-open(DEVFILE, "devices") || die;
+getset_credentials($file_credentials) unless $credentials_set;
+
+open(DEVFILE, "<:crlf", $file_devices) || die "Cannot open \"$file_devices\"";
 while(<DEVFILE>) {
     chomp;
     s/\s*#.*//;

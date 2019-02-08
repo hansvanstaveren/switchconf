@@ -1,0 +1,26 @@
+#
+# All devices with IP adress and HW-type
+#
+
+gsw52-1 2 sg300-52 core-switch-52
+gsw26-1 3 sg200-26 grand7
+gsw10-1 4 sg300-sf core-switch-montecatini stproot
+sw24-1 11 sf300-24 fotis
+# 24-2 is suspect since Montecatini
+sw24-2 12 sf300-24 hans			
+sw24-3 13 sf300-24 hans
+sw24-4 14 sf300-24 mario
+sw24-5 15 sf300-24 frontofgrand
+sw8-1 21 sf302-08 scoring10mario
+sw8-2 22 sf302-08 scoring10
+sw8-3 23 sf302-08 scoring10
+sw8-4 24 sf302-08 traian10
+sw8-5 25 sf302-08 scoring10mario
+sw8-6 26 sf302-08 mainorlando
+sw8-7 27 sf302-08 mario10
+sw8-8 28 sf302-08 scoring10
+sw8-9 29 sf302-08mpp scoring10
+gsw8-1 31 sg200-08 marcin1
+gsw8-2 32 sg200-08 bul
+gsw8-3 33 sg200-08 mario8
+gsw8-4 34 sg200-08 bul
