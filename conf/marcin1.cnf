@@ -1,0 +1,4 @@
+port gi1-2 trunk
+port gi3-6 local
+port gi7 wbf
+port gi8 scoring

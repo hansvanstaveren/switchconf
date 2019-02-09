@@ -1,0 +1,3 @@
+port gi1-2 trunk
+port fa1-6 scoring
+port fa7-8 guest

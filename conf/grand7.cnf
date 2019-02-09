@@ -1,0 +1,9 @@
+#
+# Grand 7, Orlando
+#
+port gi1-10 scoring
+port gi11-12 trunk
+port gi13-18 wbf
+port gi19-21 local
+port gi22 mario
+port gi23-26 trunk

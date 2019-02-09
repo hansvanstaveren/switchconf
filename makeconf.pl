@@ -12,10 +12,21 @@ $credentials_set = 0;
 $username = "admin";
 $password = "admin";
 
+$ferrors = 0;
+
+sub prompt {
+    my ($promptstr) = @_;
+
+    print "$promptstr: ";
+    my $answer = <>;
+    $answer =~ s/\s*$//;
+    return $answer;
+}
+
 sub getset_credentials {
     my ($fname) = @_;
 
-    if (open(CRDFILE, "<:crlf", "$fname")) {
+    if (open(CRDFILE, "<:crlf", $fname)) {
 	while (<CRDFILE>) {
 	    chomp;
 	    s/\s*#.*//;
@@ -32,7 +43,25 @@ sub getset_credentials {
 	    die "$keyw not recognized in $fname";
 	}
 	close CRDFILE;
+    } else {
+	#
+	# Get it from the operator
+	#
+	
+	$username = prompt("Username");
+	$password = prompt("Password");
+	open(CRDFILE, ">:crlf", $fname) || die;
+	print CRDFILE "credentials $username $password\n";
+	close(CRDFILE);
     }
+}
+
+sub file_error {
+    my ($host, $error) = @_;
+
+    $host_error{$host} = $error;
+    $ferrors++;
+    return 1;
 }
 
 #
@@ -46,7 +75,7 @@ sub onefile {
     # input in a .cnf, output in a .txt
     my $ifile = $dev_conf{$hostname};
     $fname = "$ifile.cnf";
-    open(CNFFILE, "<:crlf", "$dir_conf/$fname") || die "Cannot open $fname";
+    open(CNFFILE, "<:crlf", "$dir_conf/$fname") || return file_error($hostname, "$fname not found");
     $outfile = "$hostname.txt";
     open(OUTFILE, ">", "$dir_text/$outfile") || die "Cannot create $outfile";
     # No extra CR in output, even on Windows/DOS
@@ -91,7 +120,7 @@ sub onefile {
 		/(fa|gi)([0-9]+)(\-([0-9]+))?/ || die "$_ not correct portname";
 		$type = $1; $low = $2; $high = defined($4) ? $4 : $low;
 		if ($low < 1 || $high > $host_int{$type}) {
-		    die "$type$low-$high does not exist";
+		    return file_error($hostname, "$type$low-$high does not exist");
 		}
 		push(@portids, "$type$_") for ($low..$high);
 	    }
@@ -110,18 +139,19 @@ sub onefile {
 	    for (@vlanranges) {
 		my ($let, $low, $high);
 
-		/([atu])?([0-9]+)(\-([0-9]+))?/ || die "$_ not correct vlan";
+		/([atu])?([0-9]+)(\-([0-9]+))?/ ||
+		    return file_error($hostname, "$_ not correct vlan");
 		$let = $1; $low = $2; $high = defined($4) ? $4 : $low;
 		if (!defined($let)) {
 		    if ($low != $high) {
-			die "$_ not valid";
+			return file_error($hostname, "$_ not valid");
 		    }
 		    $let = "a";
 		}
-		print "let=$let, low=$low, high=$high\n";
 
 		for ($low..$high) {
-		    die "vlan $_ does not exist" unless defined($vlan_name{$_});
+		    defined($vlan_name{$_}) ||
+			return file_error($hostname, "vlan $_ does not exist");
 		    push(@vlanids, "$let$_");
 		}
 	    }
@@ -412,3 +442,10 @@ for my $devname (sort keys %dev_type) {
     onefile($devname);
 }
 print"\n";
+
+if ($ferrors) {
+    print "Errors:\n";
+    for $h (sort keys %host_error) {
+	print "$h: $host_error{$h}\n";
+    }
+}

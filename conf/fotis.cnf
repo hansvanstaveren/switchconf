@@ -1,0 +1,8 @@
+#
+# Switch for main scoring room
+#
+port fa1-12 scoring
+port fa13-16 dmz
+port fa17-18 secur
+port fa19-24 wbf
+port gi1-4 trunk
