@@ -1,4 +1,6 @@
-no warnings "experimental::smartmatch";
+#/usr/bin/perl -w
+
+#no warnings "experimental::smartmatch";
 use feature ':5.10';
 
 $file_common = "common";
@@ -57,144 +59,42 @@ sub getset_credentials {
 }
 
 sub file_error {
-    my ($host, $error) = @_;
+    my ($host, $if, $error) = @_;
 
-    $host_error{$host} = $error;
+    $host_error{$host} .= "$host($if): $error\n";
     $ferrors++;
-    return 1;
+    return "";
 }
 
 #
 # Make config for one switch
 #
-sub onefile {
-    my ($hostname) = @_;
-    my (%port_used, %portvlan);
-    my ($host_ip, $host_type, $host_flags, $layer3, $simple, %host_int);
 
-    # input in a .cnf, output in a .txt
-    my $ifile = $dev_conf{$hostname};
-    $fname = "$ifile.cnf";
-    open(CNFFILE, "<:crlf", "$dir_conf/$fname") || return file_error($hostname, "$fname not found");
-    $outfile = "$hostname.txt";
-    open(OUTFILE, ">", "$dir_text/$outfile") || die "Cannot create $outfile";
-    # No extra CR in output, even on Windows/DOS
-    binmode OUTFILE;
+sub do_fs_switch {
+    my ($hostname, $devindex, $host_type) = @_;
 
-    # set up some data based on name and type
-    $host_ip = $dev_addr{$hostname};
-    $host_type = $dev_type{$hostname};
-    $host_flags = $dev_flags{$hostname};
-    $host_int{"fa"} = $hw_fa{$host_type};
-    $host_int{"gi"} = $hw_gi{$host_type};
-    $ostype = $hw_os{$host_type};
-    $layer3 = $ostype =~ /^layer3/;
-    $simple = $ostype =~ /simple/;
+    print "FS switch, nothing yet";
+    return "";
+}
 
-    #
-    # Mark all interfaces as unused
-    #
-    for my $type ("fa", "gi") {
-	for my $intno (1..$host_int{$type}) {
-	    $port_used{"$type$intno"} = 0;
-	}
-    }
+sub do_cisco_switch {
+    my ($hostname, $devindex, $host_type) = @_;
+    my ($layer3, $simple);
 
-    while (<CNFFILE>) {
-	chomp;
-	s/\s*#.*//;
-	next if /^$/;
+    # Various differences between Cisco switches
+    # They are not all the same....
+    $layer3 = $host_ostype =~ /^layer3/;
+    $simple = $host_ostype =~ /simple/;
 
-	my ($keyword, @parameters) = split;
-	if ($keyword eq "port") {
-	    my (@portids, @vlanids);
-	    my $ports = $parameters[0];
-	    my $vlans = $parameters[1];
-
-	    my @portranges = split(/,/, $ports);
-	    for (@portranges) {
-		my ($type, $low, $high);
-		#
-		# Match fa1 and also fa1-6 (same for gi)
-		#
-		/(fa|gi)([0-9]+)(\-([0-9]+))?/ || die "$_ not correct portname";
-		$type = $1; $low = $2; $high = defined($4) ? $4 : $low;
-		if ($low < 1 || $high > $host_int{$type}) {
-		    return file_error($hostname, "$type$low-$high does not exist");
-		}
-		push(@portids, "$type$_") for ($low..$high);
-	    }
-	    #
-	    # Now @portids contains all port names
-	    #
-
-	    #
-	    # Now vlan(s)
-	    # Do alias lookup first
-	    #
-	    $repl = $synonym{lc $vlans};
-	    $vlans = $repl if(defined($repl));
-
-	    @vlanranges = split(/,/, $vlans);
-	    for (@vlanranges) {
-		my ($let, $low, $high);
-
-		/([atu])?([0-9]+)(\-([0-9]+))?/ ||
-		    return file_error($hostname, "$_ not correct vlan");
-		$let = $1; $low = $2; $high = defined($4) ? $4 : $low;
-		if (!defined($let)) {
-		    if ($low != $high) {
-			return file_error($hostname, "$_ not valid");
-		    }
-		    $let = "a";
-		}
-
-		for ($low..$high) {
-		    defined($vlan_name{$_}) ||
-			return file_error($hostname, "vlan $_ does not exist");
-		    push(@vlanids, "$let$_");
-		}
-	    }
-
-	    #
-	    # Port usage:
-	    #
-	    # a for access
-	    # t for trunk
-	    # u for trunk with untagged vlan
-	    #
-	    # Some combinations are allowed, some are not
-	    #
-
-	    for $port (@portids) {
-		die "Port $port already in use" if ($port_used{$port});
-		$port_used{$port} = 1;
-		my $usage = "";
-		for (@vlanids) {
-		    /^([atu])([0-9]+)$/ || die "internal error";
-		    #
-		    # Later definitions of untagged overwrite earlier tagged
-		    # That is why t30-35,u32 works
-		    #
-		    $portvlan{"$port:$2"} = $1;
-
-		    given("$1$usage") {
-			# First for unused so far
-			when (/^.$/) { $usage = $_; }
-			when (/^ut$/)    { $usage = "u"; }
-			when (/^(a.|uu|[ut]a)$/) {
-			    die "port $port misconfigured";
-			}
-		    }
-		}
-	    }
-	} else {
-	    die "Not recognized $keyword\n";
-	}
-    }
 
     my $template = $orig_template;
 
+    #
+    # Create vlan database command
+    # Cisco specific, but herhaps?
+    #
+    # Set names here for simple switches
+    #
     $vlandb = "vlan database\nvlan " .
 		join(',', sort{ $a <=> $b } keys %vlan_name) . "\n";
     if ($simple) {
@@ -205,23 +105,28 @@ sub onefile {
     $vlandb .= "exit\n";
     $template =~ s/VLANDB\n/$vlandb/;
 
+    #
+    # Definition of vlans for non-simple
+    # Name, and for administrative vlan the ip address
+    #
+
     my $vlandefs = "";
     unless ($simple) {
 	for my $vlan (sort {$a <=> $b} keys %vlan_name) {
 	    $vlandefs .= "interface vlan $vlan\nname $vlan_name{$vlan}\n";
 	    if ($vlan == $mainvlanid) {
-		$vlandefs .= "no ip address dhcp\nip address $network.$host_ip 255.255.255.0\n";
+		$vlandefs .= "no ip address dhcp\nip address $host_network.$host_ip 255.255.255.0\n";
 	    }
 	    $vlandefs .= "exit\n";
 	}
-	$vlandefs .= "ip default-gateway $network.1\n";
+	$vlandefs .= "ip default-gateway $host_network.1\n";
     }
     $template =~ s/VLANDEFS\n/$vlandefs/;
 
     #
     # Set spanning tree priority of best switch(core presumably) better
     #
-    $stp_prio =  $hw_stp_prio{$host_type};
+    $stp_prio =  $hw_stp_prio{$devindex};
     if ($host_flags =~ /stproot/) {
 	$stp_prio = 4096;
     }
@@ -297,7 +202,7 @@ sub onefile {
 	$snmp = $layer2_snmp;
 	$banner = "";
 	$ex = "exit\n";
-	$netwdefs = "network protocol none\nnetwork parms $network.$host_ip 255.255.255.0 $network.1\nnetwork mgmt_vlan $mainvlanid\n";
+	$netwdefs = "network protocol none\nnetwork parms $host_network.$host_ip 255.255.255.0 $host_network.1\nnetwork mgmt_vlan $mainvlanid\n";
     } else {
 	$snmp = $layer3_snmp;
 	$banner = "banner login #\nWBF Championship switch\nNo idle browsing or worse\n#\n";
@@ -313,11 +218,163 @@ sub onefile {
     # change to DOS format
     $template =~ s/\n/\r\n/g;
 
-    print OUTFILE $template;
+    return $template;
+}
+
+#
+# Common code for all manufacturers
+# Read and parse .cnf file, call manufacturer dependnet code
+# that should return the config in a string, and write the string to .txt file
+#
+sub do_switch {
+    my ($hostname, $dm, $dt) = @_;
+    my ($resulting_conf);
+
+    # input in a .cnf, output in a .txt
+    my $ifile = $dev_conf{$hostname};
+    $fname = "$ifile.cnf";
+    open(CNFFILE, "<:crlf", "$dir_conf/$fname") || return file_error($hostname, $ifile, "$fname not found");
+    $outfile = "$hostname.txt";
+    open(OUTFILE, ">", "$dir_text/$outfile") || die "Cannot create $outfile";
+    # No extra CR in output, even on Windows/DOS
+    binmode OUTFILE;
+
+    undef %host_int;
+    undef %portused;
+    undef %portvlan;
+
+    my $devindex = "$dm:$dt";
+    # set up some data based on name and type
+    $host_ip = $dev_netaddr{$hostname};
+    $host_network = $networks{$dev_netname{$hostname}};
+    $host_flags = $dev_flags{$hostname};
+    $host_int{"fa"} = $hw_fa{$devindex};
+    $host_int{"gi"} = $hw_gi{$devindex};
+    $host_ostype = $hw_os{$devindex};
+
+    #print "devindex=$devindex, network=$host_network, fa=", $host_int{"fa"}, ",gi=", $host_int{"gi"} , "\n";
+
+    #
+    # Mark all interfaces as unused
+    #
+    for my $type ("fa", "gi") {
+	for my $intno (1..$host_int{$type}) {
+	    $port_used{"$type$intno"} = 0;
+	}
+    }
+
+    while (<CNFFILE>) {
+	chomp;
+	s/\s*#.*//;
+	next if /^$/;
+
+	my ($keyword, @parameters) = split;
+	if ($keyword ne "port") {
+	    # Maybe other keyword some day
+	    file_error($hostname, $ifile, "not recognized keyword $keyword");
+	    next;
+	}
+	my (@portids, @vlanids);
+	my $ports = $parameters[0];
+	my $vlans = $parameters[1];
+
+	my @portranges = split(/,/, $ports);
+	for (@portranges) {
+	    my ($type, $low, $high);
+	    #
+	    # Match fa1 and also fa1-6 (same for gi)
+	    #
+	    /(fa|gi)([0-9]+)(\-([0-9]+))?/ || die "$_ not correct portname";
+	    $type = $1; $low = $2; $high = defined($4) ? $4 : $low;
+	    if ($low < 1 || $high > $host_int{$type}) {
+		file_error($hostname, $ifile, "$type$low-$high does not exist");
+		next;
+	    }
+	    push(@portids, "$type$_") for ($low..$high);
+	}
+	#
+	# Now @portids contains all port names
+	#
+
+	#
+	# Now vlan(s)
+	# Do alias lookup first
+	#
+	$repl = $synonym{lc $vlans};
+	$vlans = $repl if(defined($repl));
+
+	@vlanranges = split(/,/, $vlans);
+	for (@vlanranges) {
+	    my ($let, $low, $high);
+
+	    unless ( /^([atu])?([0-9]+)(\-([0-9]+))?/ ) {
+		file_error($hostname, $ifile, "$_ not correct vlan");
+		next;
+	    }
+	    $let = $1; $low = $2; $high = defined($4) ? $4 : $low;
+	    if (!defined($let)) {
+		if ($low != $high) {
+		    return file_error($hostname, $ifile, "$_ not valid");
+		}
+		$let = "a";
+	    }
+	    
+	    for ($low..$high) {
+		unless (defined($vlan_name{$_})) {
+		    file_error($hostname, $ifile, "vlan $_ does not exist");
+		    next;
+		}
+		push(@vlanids, "$let$_");
+	    }
+	}
+
+	#
+	# Port usage:
+	#
+	# a for access
+	# t for trunk
+	# u for trunk with untagged vlan
+	#
+	# Some combinations are allowed, some are not
+	#
+
+	for $port (@portids) {
+	    die "Port $port already in use" if ($port_used{$port});
+	    $port_used{$port} = 1;
+	    my $usage = "";
+	    for (@vlanids) {
+		/^([atu])([0-9]+)$/ || die "internal error";
+		#
+		# Later definitions of untagged overwrite earlier tagged
+		# That is why t30-35,u32 works
+		#
+		$portvlan{"$port:$2"} = $1;
+
+		given("$1$usage") {
+		    # First for unused so far
+		    when (/^.$/) { $usage = $_; }
+		    when (/^ut$/)    { $usage = "u"; }
+		    when (/^(a.|uu|[ut]a)$/) {
+			die "port $port misconfigured";
+		    }
+		}
+	    }
+	}
+    }
+
+    if ($dm eq "cisco") {
+	$resulting_conf = do_cisco_switch($hostname, $devindex, $dt);
+    } elsif ($dm eq "fs") {
+	$resulting_conf = do_fs_switch($hostname, $devindex, $dt);
+    }
+
+    print OUTFILE $resulting_conf;
 
     close(CNFFILE);
     close(OUTFILE);
-}; # End of one file
+
+    return $resulting_conf eq "" ? 0 : 1;
+}
 
 $orig_voice = <<ENDVOICE ;
 voice vlan oui-table add 0001e3 Siemens_AG_phone________
@@ -365,16 +422,18 @@ while(<COMMON>) {
     next if /^$/;
     my ($keyw, @rest) = split;
     if ($keyw eq "type") {
-	my ($type, $fa_ports, $gi_ports, $ostype) = @rest;
-	# print "$type has $fa_ports 100 and $gi_ports 1000, os $ostype\n";
-	$hw_fa{$type} = $fa_ports;
-	$hw_gi{$type} = $gi_ports;
-	$hw_os{$type} = $ostype;
-	$hw_stp_prio{$type} = 8;
+	my ($manuf, $type, $fa_ports, $gi_ports, $ostype) = @rest;
+	my $devindex = "$manuf:$type";
+	# print "$devindexme has $fa_ports 100 and $gi_ports 1000, os $ostype\n";
+	$hw_fa{$devindex} = $fa_ports;
+	$hw_gi{$devindex} = $gi_ports;
+	$hw_os{$devindex} = $ostype;
+	# Awful spanning tree hack, TODO
+	$hw_stp_prio{$devindex} = 8;
 	if ($type =~ /^sg([23])/ && $gi_ports >= 12) {
-	    $hw_stp_prio{$type} -= $1;
+	    $hw_stp_prio{$devindex} -= $1;
 	}
-	$hw_stp_prio{$type} *= 4096;
+	$hw_stp_prio{$devindex} *= 4096;
 	next;
     }
     if ($keyw eq "vlanbase") {
@@ -388,7 +447,19 @@ while(<COMMON>) {
 	next;
     }
     if ($keyw eq "network") {
+	my $network, $netname, $netaddr;
 	$network = $rest[0];
+	for my $ne (split(/,/, $network)) {
+	    if ($ne =~ /^((.*):)(.*)$/) {
+		$netname = $2;
+		$netaddr = $3;
+	    } else {
+		$netname = "";
+		$netaddr = $ne;
+	    }
+	    print "Add network name \"$netname\" with addr $netaddr\n";
+	    $networks{$netname} = $netaddr;
+	}
 	next;
     }
     if ($keyw eq "adminvlan") {
@@ -427,9 +498,20 @@ while(<DEVFILE>) {
     chomp;
     s/\s*#.*//;
     next if /^$/;
-    my ($name, $addr, $type, $ifile, $flags) = split;
-    print "$name has ip-addr $addr and is a $type switch, conf on $ifile, flags $flags\n";
-    $dev_addr{$name} = $addr;
+    my ($name, $addr, $manuf, $type, $ifile, $flags) = split;
+    print "$name has ip-addr $addr and is a $manuf $type switch, conf on $ifile, flags $flags\n";
+    my $network, $netname, $netaddr;
+    if ($addr =~ /^((.*):)(.*)$/) {
+	$netname = $2;
+	$netaddr = $3;
+    } else {
+	$netname = "";
+	$netaddr = $addr;
+    }
+    die "Unknown network \"$netname\"" unless (defined($networks{$netname}));
+    $dev_netname{$name} = $netname;
+    $dev_netaddr{$name} = $netaddr;
+    $dev_manuf{$name} = $manuf;
     $dev_type{$name} = $type;
     $dev_conf{$name} = $ifile;
     $dev_flags{$name} = $flags;
@@ -438,14 +520,18 @@ close DEVFILE;
 
 print "Device";
 for my $devname (sort keys %dev_type) {
-    print " $devname";
-    onefile($devname);
+    my $dm = $dev_manuf{$devname};
+    my $dt = $dev_type{$devname};
+    print "About to do device $devname, dm=$dm, dt=$dt\n";
+    if(do_switch($devname, $dm, $dt)) {
+	print " $devname($dm,$dt)";
+    }
 }
 print"\n";
 
 if ($ferrors) {
     print "Errors:\n";
     for $h (sort keys %host_error) {
-	print "$h: $host_error{$h}\n";
+	print $host_error{$h};
     }
 }

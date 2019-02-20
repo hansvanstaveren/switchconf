@@ -1,0 +1,4 @@
+port gi1 trunk
+port gi2-6 eblwbf
+port gi7-8 guest
+port gi9-10 trunk
