@@ -419,7 +419,6 @@ sub do_switch {
 	#
 	# Now @portids contains all port names
 	#
-	print "portids: @portids\n";
 
 	#
 	# Now vlan(s)
@@ -485,7 +484,6 @@ sub do_switch {
 	    }
 	}
 	$vlanlist =~ s/,,*/,/g;
-	print "vlanlist = $vlanlist\n";
 
 	#
 	# Port usage:
@@ -617,7 +615,7 @@ while(<COMMON>) {
 		$netname = "";
 		$netaddr = $ne;
 	    }
-	    print "Add network name \"$netname\" with addr $netaddr\n";
+	    # print "Add network name \"$netname\" with addr $netaddr\n";
 	    $networks{$netname} = $netaddr;
 	}
 	next;
@@ -682,9 +680,9 @@ print "Device";
 for my $devname (sort keys %dev_type) {
     my $dm = $dev_manuf{$devname};
     my $dt = $dev_type{$devname};
-    print "About to do device $devname, dm=$dm, dt=$dt\n";
+    # print "About to do device $devname, dm=$dm, dt=$dt\n";
     if(do_switch($devname, $dm, $dt)) {
-	print " $devname($dm,$dt)";
+	# print " $devname($dm,$dt)";
     }
 }
 print"\n";
