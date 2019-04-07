@@ -72,9 +72,131 @@ sub file_error {
 
 sub do_fs_switch {
     my ($hostname, $devindex, $host_type) = @_;
+    my ($config_str);
 
-    print "FS switch, nothing yet";
-    return "";
+    $config_str = "!Config FS switch $hostname\n";
+
+    $config_str .= "service timestamps log date\n";
+    $config_str .= "service timestamps debug date\n";
+    $config_str .= "!\n";
+
+    $config_str .= "hostname $hostname\n";
+    $config_str .= "!\n";
+
+    #
+    # Spanning tree stuff, add priority later
+    #
+
+    if ($spanningtreemode ne "off") {
+	$config_str .= "spanning-tree mode rstp\n";
+    } else {
+	$config_str .= "no spanning-tree\n";
+    }
+    $config_str .= "!\n";
+
+    #
+    # AAA stuff
+    #
+
+    $config_str .= "aaa authentication login default local\n";
+    $config_str .= "aaa authentication enable default none\n";
+    $config_str .= "aaa authorization exec default local\n";
+    $config_str .= "!\n";
+
+    $config_str .= "username $username password 0 $password\n"; 
+    $config_str .= "!\n";
+
+    #
+    # Vlan "database"
+    #
+
+    my @numvlans = sort {$a <=> $b} keys %vlan_name;
+
+    # Necessary ??
+    $config_str .= "vlan " . join(",", @numvlans) . "\n";
+    $config_str .= "!\n";
+
+    for my $vlan (@numvlans) {
+	$config_str .= "vlan $vlan\n name $vlan_name{$vlan}\n";
+	$config_str .= "!\n";
+    }
+
+    #
+    # Interfaces
+    #
+
+    $config_str .= "interface Null0\n";
+    $config_str .= "!\n";
+
+    for my $ptype ("fa", "gi") {
+	for my $ifno (1..$host_int{$ptype}) {
+	    $confptype = $ptype eq "gi" ? "GigaEthernet0/" : "XXX";
+	    $port = $ptype . $ifno;
+	    $config_str .= "interface $confptype$ifno\n";
+
+	    $usage = $port_usage{$port};
+	    if ($usage eq "") {
+		#
+		# Port not defined, shutdown and warn
+		#
+		$config_str .= " shutdown\n";
+		print "Warning: interface $port not active!\n";
+	    } elsif ($usage =~ /^a(.*)$/) {
+		# Single access port
+		$config_str .= " switchport pvid $1\n";
+	    } else {
+		#trunk
+		$config_str .= " switchport mode trunk\n";
+		my @alloweds;
+		for my $vl (split(/,/, $usage)) {
+		    $vl =~ /^(.)(.*)$/;
+		    my $let = $1;
+		    my $vlan = $2;
+		    if ($let eq "u") {
+			#Untagged VLAN
+			$config_str .= " switchport pvid $vlan\n";
+			$config_str .= " switchport trunk vlan-untagged $vlan\n";
+		    }
+		    # And for untagged and tagged
+		    push (@alloweds, $vlan);
+		}
+		$config_str .= " switchport trunk vlan-allowed " . join(",", @alloweds) . "\n";
+	    }
+	    $config_str .= "!\n";
+	}
+    }
+
+    #
+    # Administrative vlan
+    #
+
+    $config_str .= "interface VLAN$mainvlanid\n";
+    $config_str .= " ip address $host_network.$host_ip 255.255.255.0\n";
+    $config_str .= " no ip directed-broadcast\n";
+    $config_str .= "!\n";
+
+    #
+    # And rest
+    #
+
+    $config_str .= "ip route default $host_network.1\n";
+    $config_str .= "ip exf\n";
+    $config_str .= "!\n";
+
+    $config_str .= "ipv6 exf\n";
+    
+    $config_str .= "ip http language english\n";
+    $config_str .= "ip http server\n";
+    $config_str .= "ip exf\n";
+
+    $config_str .= "ntp server $host_network.1\n";
+    $config_str .= "ip exf\n";
+
+    #
+    # And return complete config
+    #
+
+    return $config_str;
 }
 
 sub do_cisco_switch {
@@ -91,7 +213,7 @@ sub do_cisco_switch {
 
     #
     # Create vlan database command
-    # Cisco specific, but herhaps?
+    # Cisco specific, but perhaps?
     #
     # Set names here for simple switches
     #
@@ -223,7 +345,7 @@ sub do_cisco_switch {
 
 #
 # Common code for all manufacturers
-# Read and parse .cnf file, call manufacturer dependnet code
+# Read and parse .cnf file, call manufacturer dependent code
 # that should return the config in a string, and write the string to .txt file
 #
 sub do_switch {
@@ -240,7 +362,8 @@ sub do_switch {
     binmode OUTFILE;
 
     undef %host_int;
-    undef %portused;
+    undef %port_used;
+    undef %port_usage;
     undef %portvlan;
 
     my $devindex = "$dm:$dt";
@@ -260,6 +383,7 @@ sub do_switch {
     for my $type ("fa", "gi") {
 	for my $intno (1..$host_int{$type}) {
 	    $port_used{"$type$intno"} = 0;
+	    $port_usage{"$type$intno"} = "";
 	}
     }
 
@@ -295,6 +419,7 @@ sub do_switch {
 	#
 	# Now @portids contains all port names
 	#
+	print "portids: @portids\n";
 
 	#
 	# Now vlan(s)
@@ -303,6 +428,12 @@ sub do_switch {
 	$repl = $synonym{lc $vlans};
 	$vlans = $repl if(defined($repl));
 
+	# Now not on alias anymore
+	# Split vlan usage
+	# Commaseparated, optional letter a, t or u,
+	#   followed by single number or range
+
+	$vlanlist = "";
 	@vlanranges = split(/,/, $vlans);
 	for (@vlanranges) {
 	    my ($let, $low, $high);
@@ -313,6 +444,7 @@ sub do_switch {
 	    }
 	    $let = $1; $low = $2; $high = defined($4) ? $4 : $low;
 	    if (!defined($let)) {
+		# No letter, with single number it is access port
 		if ($low != $high) {
 		    return file_error($hostname, $ifile, "$_ not valid");
 		}
@@ -325,8 +457,35 @@ sub do_switch {
 		    next;
 		}
 		push(@vlanids, "$let$_");
+		if ($let eq "a") {
+		    if ($vlanlist ne "") {
+			# Access port, must be only def for port
+			file_error($hostname, $ifile, "ports @portids: Access port combined with trunk");
+			next;
+		    }
+		    $vlanlist = "a$_";
+		} elsif ($let eq "u") {
+		    if ($vlanlist =~ /^[au]/) {
+			# Untagged vlan, must be only one
+			file_error($hostname, $ifile, "ports @portids: untagged vlan with access or more than one untagged");
+			next;
+		    }
+		    $vlanlist = "u$_,$vlanlist";
+		} elsif ($let eq "t") {
+		    if ($vlanlist =~ /^a/) {
+			# Tagged vlan, must not be combined with access
+			file_error($hostname, $ifile, "ports @portids: tagged vlan with access");
+			next;
+		    }
+		    $vlanlist .= ",t$_";
+		} else {
+		    file_error($hostname, $ifile, "internal error");
+		    next;
+		}
 	    }
 	}
+	$vlanlist =~ s/,,*/,/g;
+	print "vlanlist = $vlanlist\n";
 
 	#
 	# Port usage:
@@ -339,7 +498,8 @@ sub do_switch {
 	#
 
 	for $port (@portids) {
-	    die "Port $port already in use" if ($port_used{$port});
+	    die "Port $port already in use" if ($port_usage{$port} ne "");
+	    $port_usage{$port} = $vlanlist;
 	    $port_used{$port} = 1;
 	    my $usage = "";
 	    for (@vlanids) {
