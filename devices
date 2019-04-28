@@ -3,6 +3,8 @@
 #
 
 fs10-1 41 fs s1150 testfs
+fs10-2 42 fs s1150 testfs
+fs10-3 43 fs s1150 testfs
 gsw52-1 2 cisco sg300-52 core-switch-52
 gsw26-1 3 cisco sg200-26 grand7
 gsw10-1 4 cisco sg300-sf core-switch-montecatini stproot
