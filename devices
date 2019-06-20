@@ -14,8 +14,8 @@ sw24-3 13 cisco sf300-24 scoring24
 sw24-4 14 cisco sf300-24 scoring24
 sw24-5 15 cisco sf300-24 scoring24
 sw8-1 21 cisco sf302-08 scoring10
-sw8-2 22 cisco sf302-08 scoring10
-sw8-3 23 cisco sf302-08 scoring10
+sw8-2 22 cisco sf302-08 scoring10testman
+sw8-3 23 cisco sf302-08 netman10
 sw8-4 24 cisco sf302-08 scoring10
 sw8-5 25 cisco sf302-08 trunk10
 sw8-6 26 cisco sf302-08 scoring10
