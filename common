@@ -11,19 +11,18 @@ vlanbase 30
 vlan 0 MGMT
 vlan 1 SCORING
 vlan 2 EBLWBF
-vlan 3 BBOVIDEO
+vlan 3 BBO
 vlan 4 OTHERVIDEO
 vlan 5 GUEST
 vlan 6 SECUR
 vlan 7 MARIO
-vlan 8 SPARE2
+vlan 8 SPARE
 vlan 9 OLDADMIN
 
 adminvlan 0
 network 172.16.0,B:172.16.1
 
 alias trunk u0,t1-9
-alias asatrunk u0,t1-9
 
 spanningtree off
 

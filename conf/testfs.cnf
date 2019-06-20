@@ -1,3 +1,4 @@
-port gi1-4,gi9-10 trunk
-port gi5-6 eblwbf
-port gi7-8 guest
+port gi5-10 trunk
+port gi1-2 oldadmin
+port gi3 scoring
+port gi4 eblwbf
