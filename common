@@ -24,7 +24,9 @@ network 172.16.0,B:172.16.1
 
 alias trunk u0,t1-9
 
-spanningtree off
+# off, on or smart
+spanningtree on
+stormcontrol on
 
 #
 # All types of hardware supported

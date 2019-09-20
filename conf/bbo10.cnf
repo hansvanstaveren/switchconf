@@ -1,0 +1,4 @@
+#
+#
+port fa1-8 bbo
+port gi1-2 trunk

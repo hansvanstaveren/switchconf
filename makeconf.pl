@@ -81,6 +81,7 @@ sub do_fs_switch {
     $config_str .= "!\n";
 
     $config_str .= "hostname $hostname\n";
+    $config_str .= "ddm enable\n";
     $config_str .= "!\n";
 
     #
@@ -105,6 +106,14 @@ sub do_fs_switch {
 
     $config_str .= "username $username password 0 $password\n"; 
     $config_str .= "!\n";
+
+    # SNMP stuff
+
+    $config_str .= "snmp community public ro\n";
+
+    # LLDP stuff
+
+    $config_str .= "lldp run\n";
 
     #
     # Vlan "database"
@@ -161,6 +170,9 @@ sub do_fs_switch {
 		    push (@alloweds, $vlan);
 		}
 		$config_str .= " switchport trunk vlan-allowed " . join(",", @alloweds) . "\n";
+	    }
+	    if ($stormcontrolmode eq "on") {
+		$config_str .= " storm-control broadcast threshold 1000\n";
 	    }
 	    $config_str .= "!\n";
 	}
@@ -258,6 +270,8 @@ sub do_cisco_switch {
     if ($spanningtreemode ne "off") {
 	if ($spanningtreemode eq "smart") {
 	    $stp_cmd = "spanning-tree priority $stp_prio\n";
+	} else {
+	    $stp_cmd = "spanning-tree priority 32768\n";
 	}
     } else {
 	$stp_cmd = "no spanning-tree\n";
@@ -298,6 +312,17 @@ sub do_cisco_switch {
 			my $sepchar = $simple ? "-" : " ";
 			$ifdefs .= "switchport trunk native${sepchar}vlan $vlan\n";
 		    }
+		}
+	    }
+	    if($stormcontrolmode eq "on") {
+		if ($simple) {
+		    $ifdefs .= "storm-control broadcast level 5\n";
+		    $ifdefs .= "storm-control multicast level 5\n";
+		    $ifdefs .= "storm-control unicast level 5\n";
+		} else {
+		    $ifdefs .= "storm-control broadcast enable\n";
+		    $ifdefs .= "storm-control broadcast level 5\n";
+		    $ifdefs .= "storm-control include-multicast unknown-unicast\n";
 		}
 	    }
 	    $ifdefs .= "exit\n";
@@ -546,6 +571,7 @@ voice vlan oui-table add 00e0bb 3Com_phone______________
 ENDVOICE
 
 $layer3_snmp = <<END3SNMP ;
+snmp-server server
 snmp-server location "WBF Championship"
 snmp-server contact "Hans van Staveren <sater\@xs4all.nl>"
 snmp-server community public ro view Default
@@ -637,6 +663,10 @@ while(<COMMON>) {
     }
     if ($keyw eq "spanningtree") {
 	$spanningtreemode = $rest[0];
+	next;
+    }
+    if ($keyw eq "stormcontrol") {
+	$stormcontrolmode = $rest[0];
 	next;
     }
     if ($keyw eq "credentials") {
