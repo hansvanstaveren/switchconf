@@ -20,7 +20,7 @@ vlan 8 SPARE
 vlan 9 OLDADMIN
 
 adminvlan 0
-network 172.16.0,B:172.16.1
+network 172.16.0,B:172.17.0
 
 alias trunk u0,t1-9
 
@@ -39,4 +39,5 @@ type cisco sf302-08 8 2 layer3
 type cisco sf302-08mpp 8 2 layer3
 type cisco sg200-26 0 26 layer2
 type cisco sg200-08 0 8 layer2simple
+type cisco lgs308mp 0 8 layer2
 type fs s1150 0 10 fs
