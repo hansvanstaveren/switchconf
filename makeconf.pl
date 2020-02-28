@@ -213,12 +213,13 @@ sub do_fs_switch {
 
 sub do_cisco_switch {
     my ($hostname, $devindex, $host_type) = @_;
-    my ($layer3, $simple);
+    my ($layer3, $simple, $linksys);
 
     # Various differences between Cisco switches
     # They are not all the same....
     $layer3 = $host_ostype =~ /^layer3/;
     $simple = $host_ostype =~ /simple/;
+    $linksys = $host_ostype =~ /linksys/;
 
 
     my $template = $orig_template;
@@ -347,12 +348,20 @@ sub do_cisco_switch {
 
     if ($simple) {
 	$snmp = $layer2_snmp;
+    } else {
+	$snmp = $layer3_snmp;
+    }
+
+    if ($simple || $linksys) {
 	$banner = "";
+    } else {
+	$banner = "banner login #\nWBF Championship switch\nNo idle browsing or worse\n#\n";
+    }
+
+    if ($simple) {
 	$ex = "exit\n";
 	$netwdefs = "network protocol none\nnetwork parms $host_network.$host_ip 255.255.255.0 $host_network.1\nnetwork mgmt_vlan $mainvlanid\n";
     } else {
-	$snmp = $layer3_snmp;
-	$banner = "banner login #\nWBF Championship switch\nNo idle browsing or worse\n#\n";
 	$ex = "";
 	$netwdefs = "";
     }

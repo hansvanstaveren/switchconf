@@ -31,4 +31,6 @@ fs10-5 45 fs s1150 istanbul-core
 fs10-6 46 fs s1150 madeira-test
 fs10-7 47 fs s1150 istanbul-core
 fs10-8 B:48 fs s1150 madeira-test
-box1-sw 51 cisco lgs308mp wuhanplay
+box1-sw 51 cisco lgs308mp testlinksys
+box2-sw 52 cisco lgs308mp testlinksys
+spare-poe 53 cisco lgs308mp testlinksys
