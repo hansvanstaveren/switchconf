@@ -3,6 +3,7 @@
 #no warnings "experimental::smartmatch";
 use feature ':5.10';
 
+$file_types = "../types";
 $file_common = "common";
 $file_devices = "devices";
 $file_credentials = "credentials";
@@ -211,15 +212,132 @@ sub do_fs_switch {
     return $config_str;
 }
 
+sub do_tplink_switch {
+    my ($hostname, $devindex, $host_type) = @_;
+    my ($config_str);
+
+    $config_str = "!Config tp-link switch $hostname\n";
+
+    # $config_str .= "hostname $hostname\n";
+    # $config_str .= "ddm enable\n";
+    # $config_str .= "!\n";
+
+    #
+    # Vlan "database"
+    #
+
+    my @numvlans = sort {$a <=> $b} keys %vlan_name;
+
+    # Necessary ??
+    # $config_str .= "vlan " . join(",", @numvlans) . "\n";
+    # $config_str .= "!\n";
+
+    for my $vlan (@numvlans) {
+	$config_str .= "vlan $vlan\n name \"$vlan_name{$vlan}\"\n";
+	$config_str .= "!\n";
+    }
+
+    $config_str .= "\nip management-vlan $mainvlanid\n\n";
+
+    #
+    # AAA stuff
+    #
+
+    $config_str .= "user name $username privilege admin password 0 $password\n"; 
+    $config_str .= "!\n";
+
+    #
+    # Interfaces
+    #
+
+    $config_str .= "interface Null0\n";
+    $config_str .= "!\n";
+
+    for my $ptype ("fa", "gi") {
+	for my $ifno (1..$host_int{$ptype}) {
+	    $confptype = $ptype eq "gi" ? "gigabitEthernet 1/0/" : "XXX";
+	    $port = $ptype . $ifno;
+	    $config_str .= "interface $confptype$ifno\n";
+
+	    $usage = $port_usage{$port};
+	    if ($usage eq "") {
+		#
+		# Port not defined, shutdown and warn
+		#
+		$config_str .= " shutdown\n";
+		print "Warning: interface $port not active!\n";
+	    } elsif ($usage =~ /^a(.*)$/) {
+		# Single access port
+		$config_str .= " switchport pvid $1\n";
+	    } else {
+		#trunk
+		$config_str .= " switchport mode trunk\n";
+		my @alloweds;
+		for my $vl (split(/,/, $usage)) {
+		    $vl =~ /^(.)(.*)$/;
+		    my $let = $1;
+		    my $vlan = $2;
+		    if ($let eq "u") {
+			#Untagged VLAN
+			$config_str .= " switchport pvid $vlan\n";
+			$config_str .= " switchport trunk vlan-untagged $vlan\n";
+		    }
+		    # And for untagged and tagged
+		    push (@alloweds, $vlan);
+		}
+		$config_str .= " switchport trunk vlan-allowed " . join(",", @alloweds) . "\n";
+	    }
+	    if ($stormcontrolmode eq "on") {
+		$config_str .= " storm-control broadcast threshold 1000\n";
+	    }
+	    $config_str .= "!\n";
+	}
+    }
+
+    #
+    # Administrative vlan
+    #
+
+    $config_str .= "interface VLAN$mainvlanid\n";
+    $config_str .= " ip address $host_network.$host_ip 255.255.255.0\n";
+    $config_str .= " no ip directed-broadcast\n";
+    $config_str .= "!\n";
+
+    #
+    # And rest
+    #
+
+    $config_str .= "ip route default $host_network.1\n";
+    $config_str .= "ip exf\n";
+    $config_str .= "!\n";
+
+    $config_str .= "ipv6 exf\n";
+    
+    $config_str .= "ip http language english\n";
+    $config_str .= "ip http server\n";
+    $config_str .= "ip exf\n";
+
+    $config_str .= "ntp server $host_network.1\n";
+    $config_str .= "ip exf\n";
+
+    #
+    # And return complete config
+    #
+
+    return $config_str;
+}
+
 sub do_cisco_switch {
     my ($hostname, $devindex, $host_type) = @_;
-    my ($layer3, $simple, $linksys);
+    my ($catalyst, $extended, $layer3, $simple, $linksys);
 
     # Various differences between Cisco switches
     # They are not all the same....
     $layer3 = $host_ostype =~ /^layer3/;
     $simple = $host_ostype =~ /simple/;
     $linksys = $host_ostype =~ /linksys/;
+    $extended = $host_ostype =~ /x$/;
+    $catalyst = $host_ostype =~ /cat$/;
 
 
     my $template = $orig_template;
@@ -230,14 +348,22 @@ sub do_cisco_switch {
     #
     # Set names here for simple switches
     #
-    $vlandb = "vlan database\nvlan " .
+    unless($catalyst) {
+	$vlandb = "vlan database\nvlan " .
 		join(',', sort{ $a <=> $b } keys %vlan_name) . "\n";
-    if ($simple) {
+	if ($simple) {
+	    for my $vlan (sort {$a <=> $b} keys %vlan_name) {
+		$vlandb .= "vlan name $vlan $vlan_name{$vlan}\n";
+	    }
+	}
+	$vlandb .= "exit\n";
+    } else {
+    	# old style Cisco catalyst
+	$vlandb = "";
 	for my $vlan (sort {$a <=> $b} keys %vlan_name) {
-	    $vlandb .= "vlan name $vlan $vlan_name{$vlan}\n";
+	    $vlandb .= "vlan $vlan\nname $vlan_name{$vlan}\n";
 	}
     }
-    $vlandb .= "exit\n";
     $template =~ s/VLANDB\n/$vlandb/;
 
     #
@@ -246,7 +372,7 @@ sub do_cisco_switch {
     #
 
     my $vlandefs = "";
-    unless ($simple) {
+    unless ($simple || $catalyst) {
 	for my $vlan (sort {$a <=> $b} keys %vlan_name) {
 	    $vlandefs .= "interface vlan $vlan\nname $vlan_name{$vlan}\n";
 	    if ($vlan == $mainvlanid) {
@@ -255,6 +381,9 @@ sub do_cisco_switch {
 	    $vlandefs .= "exit\n";
 	}
 	$vlandefs .= "ip default-gateway $host_network.1\n";
+    }
+    if ($catalyst) {
+	$vlandefs .= "interface vlan $mainvlanid\nno ip address dhcp\nip address $host_network.$host_ip 255.255.255.0\n";
     }
     $template =~ s/VLANDEFS\n/$vlandefs/;
 
@@ -269,10 +398,14 @@ sub do_cisco_switch {
     # Second for layer2, after hard learning at Orlando
     $stp_cmd = "";
     if ($spanningtreemode ne "off") {
-	if ($spanningtreemode eq "smart") {
-	    $stp_cmd = "spanning-tree priority $stp_prio\n";
+	if ($catalyst) {
+	    $stp_cmd = "spanning-tree mode pvst\n";
 	} else {
-	    $stp_cmd = "spanning-tree priority 32768\n";
+	    if ($spanningtreemode eq "smart") {
+		$stp_cmd = "spanning-tree priority $stp_prio\n";
+	    } else {
+		$stp_cmd = "spanning-tree priority 32768\n";
+	    }
 	}
     } else {
 	$stp_cmd = "no spanning-tree\n";
@@ -282,13 +415,17 @@ sub do_cisco_switch {
     $cf = $simple ? "configure\n" : "";
     $template =~ s/CONFIGURE\n/$cf/;
 
+    $intprefix{"fa"} = $extended ? "2/" : $catalyst ? "0/" : "";
+    $intprefix{"gi"} = $extended ? "2/" : $catalyst ? "0/" : "";
+
     $ifdefs = "";
     for my $ptype ("fa", "gi") {
 	for my $ifno (1..$host_int{$ptype}) {
 	    $confptype = $ptype;
+	    $confprefix = $intprefix{$ptype};
 	    $confptype =~ s/(.)./$1/ if $simple;
 	    $port = $ptype . $ifno;
-	    $ifdefs .= "interface $confptype$ifno\n";
+	    $ifdefs .= "interface $confptype$confprefix$ifno\n";
 	    if (!$port_used{$port}) {
 		#
 		# Port not defined, shutdown and warn
@@ -316,7 +453,7 @@ sub do_cisco_switch {
 		}
 	    }
 	    if($stormcontrolmode eq "on") {
-		if ($simple) {
+		if ($simple || $catalyst) {
 		    $ifdefs .= "storm-control broadcast level 5\n";
 		    $ifdefs .= "storm-control multicast level 5\n";
 		    $ifdefs .= "storm-control unicast level 5\n";
@@ -331,7 +468,7 @@ sub do_cisco_switch {
     }
     $template =~ s/IFDEFS\n/$ifdefs/;
 
-    $voice = $simple ? "" : $orig_voice;
+    $voice = $simple || $catalyst ? "" : $orig_voice;
     $template =~ s/VOICE\n/$voice/;
 
     $hostcmd = "hostname $hostname";
@@ -343,13 +480,17 @@ sub do_cisco_switch {
     $confusername = "username $username password $password $urest\n"; 
     $template =~ s/USERNAME\n/$confusername/;
 
-    $sshserver = $layer3 ? "ip ssh server\nip telnet server\n" : "";
+    $sshserver = $layer3  && !$catalyst ? "ip ssh server\nip telnet server\n" : "";
     $template =~ s/SSHSERVER\n/$sshserver/;
 
     if ($simple) {
 	$snmp = $layer2_snmp;
     } else {
-	$snmp = $layer3_snmp;
+	if ($catalyst) {
+	    $snmp = $catalyst_snmp;
+	} else {
+	    $snmp = $layer3_snmp;
+	}
     }
 
     if ($simple || $linksys) {
@@ -366,7 +507,16 @@ sub do_cisco_switch {
 	$netwdefs = "";
     }
 
+    $sntp = "";
+    unless ($simple || $linksys) {
+	$sntp .= "clock source sntp\n";
+	$sntp .= "sntp unicast client enable\n";
+	$sntp .= "sntp unicast client poll\n";
+	$sntp .= "sntp server $host_network.1 poll\n";
+    }
+
     $template =~ s/SNMP\n/$snmp/;
+    $template =~ s/SNTP\n/$sntp/;
     $template =~ s/BANNER\n/$banner/;
     $template =~ s/EXIT\n/$ex/;
     $template =~ s/NETWORK\n/$netwdefs/;
@@ -409,7 +559,7 @@ sub do_switch {
     $host_int{"gi"} = $hw_gi{$devindex};
     $host_ostype = $hw_os{$devindex};
 
-    #print "devindex=$devindex, network=$host_network, fa=", $host_int{"fa"}, ",gi=", $host_int{"gi"} , "\n";
+    # print "devindex=$devindex, network=$host_network, fa=", $host_int{"fa"}, ",gi=", $host_int{"gi"} , "\n";
 
     #
     # Mark all interfaces as unused
@@ -442,8 +592,15 @@ sub do_switch {
 	    #
 	    # Match fa1 and also fa1-6 (same for gi)
 	    #
-	    /(fa|gi)([0-9]+)(\-([0-9]+))?/ || die "$_ not correct portname";
-	    $type = $1; $low = $2; $high = defined($4) ? $4 : $low;
+	    /(fa|gi)([0-9]+)(\-([0-9]*))?/ || die "$_ not correct portname";
+	    $type = $1; $low = $2; 
+	    if (defined($3)) {
+		$high = $4 ne "" ? $4 : $host_int{$type};
+	    } else {
+		$high = $low;
+	    }
+	    # print "high is now $high\n";
+	    # $high = defined($4) ? $4 : $low;
 	    if ($low < 1 || $high > $host_int{$type}) {
 		file_error($hostname, $ifile, "$type$low-$high does not exist");
 		next;
@@ -558,6 +715,8 @@ sub do_switch {
 	$resulting_conf = do_cisco_switch($hostname, $devindex, $dt);
     } elsif ($dm eq "fs") {
 	$resulting_conf = do_fs_switch($hostname, $devindex, $dt);
+    } elsif ($dm eq "tp-link") {
+	$resulting_conf = do_tplink_switch($hostname, $devindex, $dt);
     }
 
     print OUTFILE $resulting_conf;
@@ -578,6 +737,13 @@ voice vlan oui-table add 00d01e Pingtel_phone___________
 voice vlan oui-table add 00e075 Polycom/Veritel_phone___
 voice vlan oui-table add 00e0bb 3Com_phone______________
 ENDVOICE
+
+$catalyst_snmp = <<ENDCATSNMP ;
+snmp-server location "WBF Championship"
+snmp-server contact "Hans van Staveren <sater\@xs4all.nl>"
+snmp-server community public ro
+ip http server
+ENDCATSNMP
 
 $layer3_snmp = <<END3SNMP ;
 snmp-server server
@@ -603,21 +769,23 @@ HOSTNAME
 USERNAME
 SSHSERVER
 SNMP
+SNTP
 BANNER
 EXIT
 NETWORK
 ENDTEMPLATE
 
-open(COMMON, "<:crlf", $file_common) || die "Cannot open \"$file_common\"";
-while(<COMMON>) {
+open(TYPES, "<:crlf", $file_types) || die "Cannot open \"$file_types\"";
+while(<TYPES>) {
     chomp;
     s/\s*#.*//;
     next if /^$/;
     my ($keyw, @rest) = split;
     if ($keyw eq "type") {
+	die "wrong number of words @rest" unless ($#rest==4);
 	my ($manuf, $type, $fa_ports, $gi_ports, $ostype) = @rest;
 	my $devindex = "$manuf:$type";
-	# print "$devindexme has $fa_ports 100 and $gi_ports 1000, os $ostype\n";
+	# print "$devindex has $fa_ports 100 and $gi_ports 1000, os $ostype\n";
 	$hw_fa{$devindex} = $fa_ports;
 	$hw_gi{$devindex} = $gi_ports;
 	$hw_os{$devindex} = $ostype;
@@ -629,6 +797,16 @@ while(<COMMON>) {
 	$hw_stp_prio{$devindex} *= 4096;
 	next;
     }
+    die "$keyw not recognized";
+}
+close TYPES;
+
+open(COMMON, "<:crlf", $file_common) || die "Cannot open \"$file_common\"";
+while(<COMMON>) {
+    chomp;
+    s/\s*#.*//;
+    next if /^$/;
+    my ($keyw, @rest) = split;
     if ($keyw eq "vlanbase") {
 	$vlanbase = $rest[0];
 	next;
@@ -691,10 +869,13 @@ close COMMON;
 getset_credentials($file_credentials) unless $credentials_set;
 
 open(DEVFILE, "<:crlf", $file_devices) || die "Cannot open \"$file_devices\"";
+my (%addr_use);
 while(<DEVFILE>) {
+
     chomp;
     s/\s*#.*//;
     next if /^$/;
+
     my ($name, $addr, $manuf, $type, $ifile, $flags) = split;
     print "$name has ip-addr $addr and is a $manuf $type switch, conf on $ifile, flags $flags\n";
     my $network, $netname, $netaddr;
@@ -706,6 +887,17 @@ while(<DEVFILE>) {
 	$netaddr = $addr;
     }
     die "Unknown network \"$netname\"" unless (defined($networks{$netname}));
+
+    die "Wrong address $netaddr for $name" unless ($netaddr > 1 && $netaddr < 255);
+    my $netid = "$netname:$netaddr";
+    my $au = $addr_use{$netid};
+    #print "$name has netid $netid, au=$au\n";
+
+    if ($au) {
+	die "Illegal re-use of $netid";
+    }
+    $addr_use{$netid} = 1;
+
     $dev_netname{$name} = $netname;
     $dev_netaddr{$name} = $netaddr;
     $dev_manuf{$name} = $manuf;
@@ -721,7 +913,7 @@ for my $devname (sort keys %dev_type) {
     my $dt = $dev_type{$devname};
     # print "About to do device $devname, dm=$dm, dt=$dt\n";
     if(do_switch($devname, $dm, $dt)) {
-	# print " $devname($dm,$dt)";
+	print " $devname($dm,$dt)";
     }
 }
 print"\n";

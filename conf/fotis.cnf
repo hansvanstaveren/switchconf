@@ -1,8 +1,0 @@
-#
-# Switch for main scoring room
-#
-port fa1-12 scoring
-port fa13-15 mgmt
-port fa16-18 secur
-port fa19-24 bbo
-port gi1-4 trunk

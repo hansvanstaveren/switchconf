@@ -1,5 +1,0 @@
-#
-# Fiber core switch used in Montecatini
-#
-port gi1-9 trunk
-port gi10 asatrunk
