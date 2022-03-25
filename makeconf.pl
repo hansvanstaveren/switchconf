@@ -1,5 +1,4 @@
 #/usr/bin/perl -w
-#
 
 #no warnings "experimental::smartmatch";
 use feature ':5.10';
