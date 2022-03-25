@@ -1,0 +1,3 @@
+port gi1 scoring
+port gi2 guest
+port gi3-10 trunk

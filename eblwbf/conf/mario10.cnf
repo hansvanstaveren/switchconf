@@ -1,0 +1,4 @@
+port gi1-2 trunk
+port fa1 mario
+port fa2-7 othervideo
+port fa8 scoring
