@@ -29,8 +29,8 @@ gsw8-3 33 cisco sg200-08 alltrunk
 gsw8-4 34 cisco sg200-08 alltrunk
 fs10-1 41 fs s1150 alltrunk
 fs10-2 42 fs s1150 hans8
-fs10-3 43 fs s1150 alltrunk
-fs10-4 44 fs s1150 alltrunk
+fs10-3 43 fs s1150 scoring6
+fs10-4 44 fs s1150 scoring6
 fs10-5 45 fs s1150 camerasetup
 fs10-6 savoy:46 fs s1150 alltrunk
 fs10-7 47 fs s1150 georgifs
