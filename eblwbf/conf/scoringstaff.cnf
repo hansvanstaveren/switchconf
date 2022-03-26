@@ -1,3 +1,4 @@
 port gi1-12 scoring
-port gi13-24 eblwbf
+port gi13-23 eblwbf
+port gi24 spare
 port gi25- trunk
