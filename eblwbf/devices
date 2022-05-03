@@ -15,7 +15,7 @@ sw24-2 12 cisco sf300-24 allvideo
 # sw24-5 15 cisco sf300-24 bbo24scoring1
 # swp24-1 16 cisco sf500-24p sf524
 sw8-1 21 cisco sf302-08 allscoring
-sw8-2 22 cisco sf302-08 allscoring
+sw8-2 22 cisco sf302-08 allmario
 sw8-3 23 cisco sf302-08 mario10
 sw8-4 24 cisco sf302-08 allscoring
 sw8-5 25 cisco sf302-08 allscoring
@@ -31,7 +31,7 @@ fs10-1 41 fs s1150 alltrunk
 fs10-2 42 fs s1150 hans8
 fs10-3 43 fs s1150 alltrunk
 fs10-4 44 fs s1150 alltrunk
-fs10-5 45 fs s1150 camerasetup
+fs10-5 45 fs s1150 spansw
 fs10-6 46 fs s1150 alltrunk
 fs10-7 47 fs s1150 georgifs
 fs10-8 48 fs s1150 scoring6
