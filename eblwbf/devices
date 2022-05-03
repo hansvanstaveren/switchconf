@@ -8,14 +8,14 @@ gsw10-1 4 cisco sg300-sf alltrunk
 gsw48-2 5 cisco sg200-50 alltrunk
 # local airmax 6 admin/netman-wbf123
 # remote airmax 7
-sw24-1 11 cisco sf300-24 allscoring
+# sw24-1 11 cisco sf300-24 fotis
 sw24-2 12 cisco sf300-24 allvideo
 # sw24-3 13 cisco sf300-24 bbo24
 # sw24-4 14 cisco sf300-24 bbo24
 # sw24-5 15 cisco sf300-24 bbo24scoring1
 # swp24-1 16 cisco sf500-24p sf524
 sw8-1 21 cisco sf302-08 allscoring
-sw8-2 22 cisco sf302-08 allmario
+sw8-2 22 cisco sf302-08 allscoring
 sw8-3 23 cisco sf302-08 mario10
 sw8-4 24 cisco sf302-08 allscoring
 sw8-5 25 cisco sf302-08 allscoring
@@ -29,10 +29,10 @@ gsw8-3 33 cisco sg200-08 alltrunk
 gsw8-4 34 cisco sg200-08 alltrunk
 fs10-1 41 fs s1150 alltrunk
 fs10-2 42 fs s1150 hans8
-fs10-3 43 fs s1150 alltrunk
-fs10-4 44 fs s1150 alltrunk
-fs10-5 45 fs s1150 spansw
-fs10-6 46 fs s1150 alltrunk
+fs10-3 43 fs s1150 scoring6
+fs10-4 44 fs s1150 scoring6
+fs10-5 45 fs s1150 camerasetup
+fs10-6 savoy:46 fs s1150 alltrunk
 fs10-7 47 fs s1150 georgifs
 fs10-8 48 fs s1150 scoring6
 box1-sw 51 cisco lgs308mp testlinksys
