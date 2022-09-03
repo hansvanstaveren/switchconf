@@ -96,10 +96,19 @@ sub do_fs_switch {
     }
     $config_str .= "!\n";
 
+    #	
+    # Time zone settings
+    #
+
+    $config_str .= "time-zone tz ";
+    $config_str .= $timezone;
+    $config_str .= " 0\n";
+    $config_str .= "!\n";    
+
     #
     # AAA stuff
     #
-
+ 
     $config_str .= "aaa authentication login default local\n";
     $config_str .= "aaa authentication enable default none\n";
     $config_str .= "aaa authorization exec default local\n";
@@ -203,6 +212,7 @@ sub do_fs_switch {
     $config_str .= "ip exf\n";
 
     $config_str .= "ntp server $host_network.1\n";
+    $config_str .= "ntp client enable\n";
     $config_str .= "ip exf\n";
 
     #
@@ -318,6 +328,7 @@ sub do_tplink_switch {
     $config_str .= "ip exf\n";
 
     $config_str .= "ntp server $host_network.1\n";
+    $config_str .= "ntp client enable\n";
     $config_str .= "ip exf\n";
 
     #
@@ -509,6 +520,9 @@ sub do_cisco_switch {
 
     $sntp = "";
     unless ($simple || $linksys) {
+	$sntp .= 'clock timezone " " '; # setting
+	$sntp .= $timezone;		# time
+	$sntp .= "\n";			# zone
 	$sntp .= "clock source sntp\n";
 	$sntp .= "sntp unicast client enable\n";
 	$sntp .= "sntp unicast client poll\n";
@@ -850,6 +864,10 @@ while(<COMMON>) {
     }
     if ($keyw eq "spanningtree") {
 	$spanningtreemode = $rest[0];
+	next;
+    }
+    if ($keyw eq "timezone") {
+	$timezone = $rest[0];
 	next;
     }
     if ($keyw eq "stormcontrol") {
