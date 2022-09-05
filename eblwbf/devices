@@ -42,3 +42,4 @@ gswp24-1 61 cisco sg300-28 alltrunk
 gswp24-2 62 cisco sg300-28 alltrunk
 gswp24-3 63 cisco sg300-28 alltrunk
 gswp24-4 64 cisco sg200-26 scoring24g
+xx 71 tp-link tl-sg2210p alltrunk
