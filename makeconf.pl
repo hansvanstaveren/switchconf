@@ -15,6 +15,8 @@ $credentials_set = 0;
 $username = "admin";
 $password = "admin";
 
+$timezone = "";
+
 $ferrors = 0;
 
 sub prompt {
@@ -100,10 +102,12 @@ sub do_fs_switch {
     # Time zone settings
     #
 
-    $config_str .= "time-zone tz ";
-    $config_str .= $timezone;
-    $config_str .= " 0\n";
-    $config_str .= "!\n";    
+    if ($timezone ne "") {
+	$config_str .= "time-zone tz ";
+	$config_str .= $timezone;
+	$config_str .= " 0\n";
+	$config_str .= "!\n";    
+    }
 
     #
     # AAA stuff
@@ -349,6 +353,7 @@ sub do_cisco_switch {
     $linksys = $host_ostype =~ /linksys/;
     $extended = $host_ostype =~ /x$/;
     $catalyst = $host_ostype =~ /cat$/;
+    $cbs = $host_ostype =~ /cbs$/;
 
 
     my $template = $orig_template;
@@ -374,6 +379,9 @@ sub do_cisco_switch {
 	for my $vlan (sort {$a <=> $b} keys %vlan_name) {
 	    $vlandb .= "vlan $vlan\nname $vlan_name{$vlan}\n";
 	}
+    }
+    if ($cbs) {
+	$vlandb .= "no ip routing\n";
     }
     $template =~ s/VLANDB\n/$vlandb/;
 
@@ -444,6 +452,7 @@ sub do_cisco_switch {
 		$ifdefs .= "shutdown\n";
 		print "Warning: interface $port not active!\n";
 	    } else {
+		my $portmode = "";
 		for $vlan (sort keys %vlan_name) {
 		    my $pv = $portvlan{"$port:$vlan"};
 		    #
@@ -454,17 +463,24 @@ sub do_cisco_switch {
 		    # It is, add definition
 		    #
 		    if ($pv eq "a") {
-			$ifdefs .= "switchport mode access\nswitchport access vlan $vlan\n";
+			$ifdefs .= "switchport mode access\n" if ($portmode eq "");
+			$portmode = "a";
+			$ifdefs .= "switchport access vlan $vlan\n";
 		    } elsif ($pv eq "t") {
+			$ifdefs .= "switchport mode trunk\n" if ($portmode eq "");
+			$portmode = "t";
 			$ifdefs .= "switchport trunk allowed vlan add $vlan\n";
 		    } elsif ($pv eq "u") {
+			$ifdefs .= "switchport mode trunk\n" if ($portmode eq "");
+			$portmode = "t";
+			$ifdefs .= "switchport trunk allowed vlan add $vlan\n";
 			my $sepchar = $simple ? "-" : " ";
 			$ifdefs .= "switchport trunk native${sepchar}vlan $vlan\n";
 		    }
 		}
 	    }
 	    if($stormcontrolmode eq "on") {
-		if ($simple || $catalyst) {
+		if ($simple || $catalyst || $cbs) {
 		    $ifdefs .= "storm-control broadcast level 5\n";
 		    $ifdefs .= "storm-control multicast level 5\n";
 		    $ifdefs .= "storm-control unicast level 5\n";
@@ -520,9 +536,11 @@ sub do_cisco_switch {
 
     $sntp = "";
     unless ($simple || $linksys) {
-	$sntp .= 'clock timezone " " '; # setting
-	$sntp .= $timezone;		# time
-	$sntp .= "\n";			# zone
+	if ($timezone ne "") {
+	    $sntp .= 'clock timezone " " '; # setting
+	    $sntp .= $timezone;		# time
+	    $sntp .= "\n";			# zone
+	}
 	$sntp .= "clock source sntp\n";
 	$sntp .= "sntp unicast client enable\n";
 	$sntp .= "sntp unicast client poll\n";
@@ -725,6 +743,11 @@ sub do_switch {
 	}
     }
 
+    my $stmode = $spanningtreemode;
+    if ($host_flags =~ /stp:off/) {
+	$spanningtreemode = "off";
+    }
+
     if ($dm eq "cisco") {
 	$resulting_conf = do_cisco_switch($hostname, $devindex, $dt);
     } elsif ($dm eq "fs") {
@@ -732,6 +755,8 @@ sub do_switch {
     } elsif ($dm eq "tp-link") {
 	$resulting_conf = do_tplink_switch($hostname, $devindex, $dt);
     }
+
+    $spanningtreemode = $stmode;
 
     print OUTFILE $resulting_conf;
 
