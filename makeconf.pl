@@ -402,7 +402,8 @@ sub do_cisco_switch {
 	$vlandefs .= "ip default-gateway $host_network.1\n";
     }
     if ($catalyst) {
-	$vlandefs .= "interface vlan $mainvlanid\nno ip address dhcp\nip address $host_network.$host_ip 255.255.255.0\n";
+	$vlandefs .= "interface vlan $mainvlanid\nno ip address dhcp\nip address $host_network.$host_ip 255.255.255.0\nexit\n";
+	$vlandefs .= "ip default-gateway $host_network.1\n";
     }
     $template =~ s/VLANDEFS\n/$vlandefs/;
 
@@ -453,6 +454,14 @@ sub do_cisco_switch {
 		print "Warning: interface $port not active!\n";
 	    } else {
 		my $portmode = "";
+
+		#
+		# Old catalyst switch does not like the add
+		#  with the first allowed
+		# SMB switches require it though
+		#
+		my $addcmd = $catalyst ? "" : "add";
+
 		for $vlan (sort keys %vlan_name) {
 		    my $pv = $portvlan{"$port:$vlan"};
 		    #
@@ -469,11 +478,13 @@ sub do_cisco_switch {
 		    } elsif ($pv eq "t") {
 			$ifdefs .= "switchport mode trunk\n" if ($portmode eq "");
 			$portmode = "t";
-			$ifdefs .= "switchport trunk allowed vlan add $vlan\n";
+			$ifdefs .= "switchport trunk allowed vlan $addcmd $vlan\n";
+			$addcmd = "add";
 		    } elsif ($pv eq "u") {
 			$ifdefs .= "switchport mode trunk\n" if ($portmode eq "");
 			$portmode = "t";
-			$ifdefs .= "switchport trunk allowed vlan add $vlan\n";
+			$ifdefs .= "switchport trunk allowed vlan $addcmd $vlan\n";
+			$addcmd = "add";
 			my $sepchar = $simple ? "-" : " ";
 			$ifdefs .= "switchport trunk native${sepchar}vlan $vlan\n";
 		    }
@@ -502,9 +513,13 @@ sub do_cisco_switch {
     $hostcmd = "set $hostcmd" if ($simple);
     $template =~ s/HOSTNAME\n/$hostcmd\n/;
 
+    #
     # privilege used to be "level"
+    # For older catalyst switches password MUST be last option!
+    #
+
     $urest = $simple ? "override-complexity-check" : "privilege 15";
-    $confusername = "username $username password $password $urest\n"; 
+    $confusername = "username $username $urest password $password\n"; 
     $template =~ s/USERNAME\n/$confusername/;
 
     $sshserver = $layer3  && !$catalyst ? "ip ssh server\nip telnet server\n" : "";
@@ -535,7 +550,7 @@ sub do_cisco_switch {
     }
 
     $sntp = "";
-    unless ($simple || $linksys) {
+    unless ($simple || $linksys || $catalyst) {
 	if ($timezone ne "") {
 	    $sntp .= 'clock timezone " " '; # setting
 	    $sntp .= $timezone;		# time
@@ -546,12 +561,21 @@ sub do_cisco_switch {
 	$sntp .= "sntp unicast client poll\n";
 	$sntp .= "sntp server $host_network.1 poll\n";
     }
+    if ($catalyst) {
+	$sntp .= "ntp peer $host_network.1\n";
+    }
+
+    $vtydefs = "";
+    if ($catalyst) {
+	$vtydefs = "line con 0\nline vty 0 15\nlogin local\n";
+    }
 
     $template =~ s/SNMP\n/$snmp/;
     $template =~ s/SNTP\n/$sntp/;
     $template =~ s/BANNER\n/$banner/;
     $template =~ s/EXIT\n/$ex/;
     $template =~ s/NETWORK\n/$netwdefs/;
+    $template =~ s/VTY\n/$vtydefs/;
 
     # change to DOS format
     $template =~ s/\n/\r\n/g;
@@ -812,6 +836,7 @@ SNTP
 BANNER
 EXIT
 NETWORK
+VTY
 ENDTEMPLATE
 
 open(TYPES, "<:crlf", $file_types) || die "Cannot open \"$file_types\"";

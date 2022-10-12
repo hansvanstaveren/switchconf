@@ -18,6 +18,7 @@ type cisco sg200-26 0 26 layer2
 type cisco sg200-08 0 8 layer2simple
 type cisco sf500-24p 24 4 layer3x
 type cisco c2960 24 0 layer3cat
+type cisco c2960x 0 24 layer3cat
 type cisco lgs308mp 0 8 layer2linksys
 type cisco dcasw 24 2 layer3cat
 type fs s1150 0 10 fs
