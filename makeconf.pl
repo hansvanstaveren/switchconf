@@ -476,11 +476,13 @@ sub do_cisco_switch {
 			$portmode = "a";
 			$ifdefs .= "switchport access vlan $vlan\n";
 		    } elsif ($pv eq "t") {
+			# $ifdefs .= "switchport trunk encapsulation dot1q\n" if ($catalyst && $portmode eq "");
 			$ifdefs .= "switchport mode trunk\n" if ($portmode eq "");
 			$portmode = "t";
 			$ifdefs .= "switchport trunk allowed vlan $addcmd $vlan\n";
 			$addcmd = "add";
 		    } elsif ($pv eq "u") {
+			# $ifdefs .= "switchport trunk encapsulation dot1q\n" if ($catalyst && $portmode eq "");
 			$ifdefs .= "switchport mode trunk\n" if ($portmode eq "");
 			$portmode = "t";
 			$ifdefs .= "switchport trunk allowed vlan $addcmd $vlan\n";
