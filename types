@@ -8,7 +8,7 @@ type cisco sg300-28 0 28 layer3
 type cisco sg300-20 0 20 layer3
 type cisco sg300-10 0 10 layer3
 type cisco sg300-sf 0 10 layer3
-type cisco cbs250-8pp 0 10 layer3cbs
+type cisco cbs250-8pp 0 10 layer3poecbs
 type cisco cbs250-8t-d 0 8 layer3cbs
 type cisco sf300-24 24 4 layer3
 type cisco sf302-08 8 2 layer3

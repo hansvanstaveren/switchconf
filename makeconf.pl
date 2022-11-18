@@ -344,13 +344,14 @@ sub do_tplink_switch {
 
 sub do_cisco_switch {
     my ($hostname, $devindex, $host_type) = @_;
-    my ($catalyst, $extended, $layer3, $simple, $linksys);
+    my ($catalyst, $extended, $layer3, $simple, $poe, $linksys);
 
     # Various differences between Cisco switches
     # They are not all the same....
     $layer3 = $host_ostype =~ /^layer3/;
     $simple = $host_ostype =~ /simple/;
     $linksys = $host_ostype =~ /linksys/;
+    $poe = $host_ostype =~ /poe/;
     $extended = $host_ostype =~ /x$/;
     $catalyst = $host_ostype =~ /cat$/;
     $cbs = $host_ostype =~ /cbs$/;
@@ -537,6 +538,12 @@ sub do_cisco_switch {
 	}
     }
 
+    if ($poe) {
+	$poelimit = "power inline limit-mode port\n";
+    } else {
+	$poelimit = "";
+    }
+
     if ($simple || $linksys) {
 	$banner = "";
     } else {
@@ -574,6 +581,7 @@ sub do_cisco_switch {
 
     $template =~ s/SNMP\n/$snmp/;
     $template =~ s/SNTP\n/$sntp/;
+    $template =~ s/POE\n/$poelimit/;
     $template =~ s/BANNER\n/$banner/;
     $template =~ s/EXIT\n/$ex/;
     $template =~ s/NETWORK\n/$netwdefs/;
@@ -835,6 +843,7 @@ USERNAME
 SSHSERVER
 SNMP
 SNTP
+POE
 BANNER
 EXIT
 NETWORK
