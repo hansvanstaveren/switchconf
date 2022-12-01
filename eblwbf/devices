@@ -2,6 +2,8 @@
 # All devices with IP address and HW-type
 #
 
+gsw24-1 2 cisco sg200-26 alltrunk
+# Rename next one gsw24-2
 gsw26-1 3 cisco sg200-26 scoringstaff
 gsw10-1 4 cisco sg300-sf alltrunk
 gsw16-1 5 cisco sg300-20 alltrunk
@@ -34,7 +36,7 @@ fs10-2 42 fs s1150 hans8
 fs10-3 43 fs s1150 scoring6
 fs10-4 44 fs s1150 scoring6
 fs10-5 45 fs s1150 camerasetup
-fs10-6 savoy:46 fs s1150 alltrunk
+fs10-6 46 fs s1150 alltrunk
 fs10-7 47 fs s1150 georgifs
 fs10-8 48 fs s1150 scoring6
 box1-sw 51 cisco lgs308mp testlinksys

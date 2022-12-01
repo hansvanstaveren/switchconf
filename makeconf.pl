@@ -2,6 +2,7 @@
 
 #no warnings "experimental::smartmatch";
 use feature ':5.10';
+use experimental qw( switch );
 
 $file_types = "../types";
 $file_common = "common";
@@ -352,7 +353,7 @@ sub do_cisco_switch {
     $simple = $host_ostype =~ /simple/;
     $linksys = $host_ostype =~ /linksys/;
     $poe = $host_ostype =~ /poe/;
-    $extended = $host_ostype =~ /x$/;
+    $extended = $host_ostype =~ /3x/;
     $catalyst = $host_ostype =~ /cat$/;
     $cbs = $host_ostype =~ /cbs$/;
 
@@ -948,6 +949,7 @@ close COMMON;
 getset_credentials($file_credentials) unless $credentials_set;
 
 open(DEVFILE, "<:crlf", $file_devices) || die "Cannot open \"$file_devices\"";
+my (%name_use);
 my (%addr_use);
 while(<DEVFILE>) {
 
@@ -957,6 +959,10 @@ while(<DEVFILE>) {
 
     my ($name, $addr, $manuf, $type, $ifile, $flags) = split;
     print "$name has ip-addr $addr and is a $manuf $type switch, conf on $ifile, flags $flags\n";
+    if ($name_use{$name}) {
+	die "Illegal re-use of $name";
+    }
+    $name_use{$name} = 1;
     my $network, $netname, $netaddr;
     if ($addr =~ /^((.*):)(.*)$/) {
 	$netname = $2;
