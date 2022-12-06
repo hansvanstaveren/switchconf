@@ -8,6 +8,7 @@ gsw26-1 3 cisco sg200-26 scoringstaff
 gsw10-1 4 cisco sg300-sf alltrunk
 gsw16-1 5 cisco sg300-20 alltrunk
 gsw16-2 6 cisco sg200-18 alltrunk
+gsw16-3 7 cisco sg300-20 alltrunk
 # local airmax 6 admin/netman-wbf123
 # remote airmax 7
 # swp24-1 16 cisco sf500-24p sf524
