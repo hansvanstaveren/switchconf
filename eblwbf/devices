@@ -11,7 +11,7 @@ gsw16-2 6 cisco sg200-18 alltrunk
 gsw16-3 7 cisco sg300-20 alltrunk
 # local airmax 6 admin/netman-wbf123
 # remote airmax 7
-# swp24-1 16 cisco sf500-24p sf524
+swp12-1 10 cisco c2960c-12 alltrunk
 gswp10-1 11 cisco cbs250-8pp alltrunk
 gswp10-2 12 cisco cbs250-8pp alltrunk
 gswp10-3 13 cisco cbs250-8pp alltrunk
