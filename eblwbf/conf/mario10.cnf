@@ -1,4 +1,6 @@
-port gi1-2 trunk
+port gi1 nt_wan
+port gi2 trunk
 port fa1 mario
-port fa2-7 othervideo
+port fa2 nt_wan
+port fa3-7 othervideo
 port fa8 scoring

@@ -18,6 +18,14 @@ vlan 6 SECUR
 vlan 7 MARIO
 vlan 8 SPARE
 vlan 9 OLDADMIN
+#
+# Extra VLAN's, not trunked
+#
+vlan 10 NT_WAN
+vlan 11 NT_SPARE1
+vlan 12 NT_SPARE2
+vlan 13 NT_SPARE3
+vlan 14 NT_SPARE4
 
 adminvlan 0
 network 172.16.0,savoy:172.17.0
