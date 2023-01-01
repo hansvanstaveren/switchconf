@@ -3,27 +3,50 @@
 # All types of hardware supported
 # parameters are number of fast(100Mbps) and gig(1000Mbps) ports
 #
-# type cisco sg300-52 0 52 layer3
-type cisco sg300-28 0 28 layer3
-type cisco sg300-20 0 20 layer3
-type cisco sg300-10 0 10 layer3
-type cisco sg300-sf 0 10 layer3
+
+#
+# Catalyst type switches
+#
+type cisco c2960 24 0 layer3cat
+type cisco c2960c-12 12 2 layer3cat
+type cisco c2960x 0 24 layer3cat
+type cisco c3560-24 24 2 layer3cat
+#
+# cbs250
+#
 type cisco cbs250-8pp 0 10 layer3poecbs
 type cisco cbs250-8t-d 0 8 layer3cbs
-type cisco sf300-24 24 4 layer3
+#
+# Linksys
+#
+type cisco lgs308mp 0 8 layer2linksys
+#
+# SMB type non gig
+#
 type cisco sf200-24fp 24 2 layer2poe
+type cisco sf300-24 24 4 layer3
 type cisco sf302-08 8 2 layer3
-# type cisco sf302-08mpp 8 2 layer3
+type cisco sf500-24p 24 4 layer3xpoe
+#
+# SMB type gig layer 2
+#
+type cisco sg200-08 0 8 layer2simple
 type cisco sg200-18 0 18 layer2
 type cisco sg200-26 0 26 layer2
-# type cisco sg200-50 0 50 layer2
-type cisco sg200-08 0 8 layer2simple
-type cisco sf500-24p 24 4 layer3xpoe
-type cisco c2960 24 0 layer3cat
-type cisco c2960x 0 24 layer3cat
-type cisco lgs308mp 0 8 layer2linksys
-type cisco c3560-24 24 2 layer3cat
-type cisco c2960c-12 12 2 layer3cat
+type cisco sg200-50p 0 50 layer2poe
+#
+# SMB type gig layer 3
+#
+type cisco sg300-10 0 10 layer3
+type cisco sg300-20 0 20 layer3
+type cisco sg300-28 0 28 layer3
+type cisco sg300-sf 0 10 layer3
+#
+# fs.com switches
+#
 type fs s1150 0 10 fs
 type fs s3150 0 10 fs
+#
+# Tp-link, experimental
+#
 type tp-link tl-sg2210p 0 10 tp-link

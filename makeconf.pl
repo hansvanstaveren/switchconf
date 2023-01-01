@@ -401,6 +401,7 @@ sub do_cisco_switch {
 	    }
 	    $vlandefs .= "exit\n";
 	}
+	$vlandefs .= "macro auto disabled\n";
 	$vlandefs .= "ip default-gateway $host_network.1\n";
     }
     if ($catalyst) {
@@ -526,7 +527,7 @@ sub do_cisco_switch {
     $confusername = "username $username $urest password $password\n"; 
     $template =~ s/USERNAME\n/$confusername/;
 
-    $sshserver = $layer3  && !$catalyst ? "ip ssh server\nip telnet server\n" : "";
+    $sshserver = $layer3  && !$catalyst ? "ip ssh server\nip ssh password-auth\nip telnet server\n" : "";
     $template =~ s/SSHSERVER\n/$sshserver/;
 
     if ($simple) {
