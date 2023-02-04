@@ -608,8 +608,8 @@ sub do_switch {
     my $ifile = $dev_conf{$hostname};
     $fname = "$ifile.cnf";
     open(CNFFILE, "<:crlf", "$dir_conf/$fname") || return file_error($hostname, $ifile, "$fname not found");
-    $outfile = "$hostname.txt";
-    open(OUTFILE, ">", "$dir_text/$outfile") || die "Cannot create $outfile";
+    $outfile = "$dir_text/$hostname.txt";
+    open(OUTFILE, ">", "$outfile") || die "Cannot create $outfile";
     # No extra CR in output, even on Windows/DOS
     binmode OUTFILE;
 
@@ -794,7 +794,11 @@ sub do_switch {
 
     $spanningtreemode = $stmode;
 
-    print OUTFILE $resulting_conf;
+    if ($ferrors) {
+	unlink($outfile);
+    } else {
+	print OUTFILE $resulting_conf;
+    }
 
     close(CNFFILE);
     close(OUTFILE);
@@ -959,7 +963,7 @@ while(<DEVFILE>) {
     next if /^$/;
 
     my ($name, $addr, $manuf, $type, $ifile, $flags) = split;
-    print "$name has ip-addr $addr and is a $manuf $type switch, conf on $ifile, flags $flags\n";
+    # print "$name has ip-addr $addr and is a $manuf $type switch, conf on $ifile, flags $flags\n";
     if ($name_use{$name}) {
 	die "Illegal re-use of $name";
     }
@@ -993,20 +997,26 @@ while(<DEVFILE>) {
 }
 close DEVFILE;
 
-print "Device";
+# print "Device";
+my $ndevs=0;
+my $nerrs=0;
+my $ndeverrors=0;
+
 for my $devname (sort keys %dev_type) {
+    $ndevs++;
     my $dm = $dev_manuf{$devname};
     my $dt = $dev_type{$devname};
     # print "About to do device $devname, dm=$dm, dt=$dt\n";
     if(do_switch($devname, $dm, $dt)) {
-	print " $devname($dm,$dt)";
+	if ($ferrors) {
+	    $nerrs += $ferrors;
+	    $ndeverrors++;
+	    print "$devname($dm,$dt):\n";
+	    print $host_error{$devname};
+	    # delete $host_error{$devname};
+	}
+	$ferrors = 0;
     }
 }
-print"\n";
 
-if ($ferrors) {
-    print "Errors:\n";
-    for $h (sort keys %host_error) {
-	print $host_error{$h};
-    }
-}
+print "Made configuration for $ndevs devices with $ndeverrors wrong totalling $nerrs errors\n";

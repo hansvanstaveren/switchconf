@@ -33,6 +33,7 @@ type cisco sf500-24p 24 4 layer3xpoe
 type cisco sg200-08 0 8 layer2simple
 type cisco sg200-18 0 18 layer2
 type cisco sg200-26 0 26 layer2
+type cisco sg200-26p 0 26 layer2poe
 type cisco sg200-50p 0 50 layer2poe
 #
 # SMB type gig layer 3
@@ -40,6 +41,7 @@ type cisco sg200-50p 0 50 layer2poe
 type cisco sg300-10 0 10 layer3
 type cisco sg300-20 0 20 layer3
 type cisco sg300-28 0 28 layer3
+type cisco sg300-28p 0 28 layer3poe
 type cisco sg300-sf 0 10 layer3
 #
 # fs.com switches
