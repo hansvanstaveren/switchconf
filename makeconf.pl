@@ -346,6 +346,7 @@ sub do_tplink_switch {
 sub do_cisco_switch {
     my ($hostname, $devindex, $host_type) = @_;
     my ($catalyst, $extended, $layer3, $simple, $poe, $linksys);
+    my ($cbs, $fifty);
 
     # Various differences between Cisco switches
     # They are not all the same....
@@ -356,6 +357,7 @@ sub do_cisco_switch {
     $extended = $host_ostype =~ /3x/;
     $catalyst = $host_ostype =~ /cat$/;
     $cbs = $host_ostype =~ /cbs$/;
+    $fifty = $host_ostype =~ /fifty$/;
 
 
     my $template = $orig_template;
@@ -438,8 +440,8 @@ sub do_cisco_switch {
     $cf = $simple ? "configure\n" : "";
     $template =~ s/CONFIGURE\n/$cf/;
 
-    $intprefix{"fa"} = $extended ? "2/" : $catalyst ? "0/" : "";
-    $intprefix{"gi"} = $extended ? "2/" : $catalyst ? "0/" : "";
+    $intprefix{"fa"} = $extended ? "1/" : $catalyst ? "0/" : "";
+    $intprefix{"gi"} = $extended ? "1/" : $catalyst ? "0/" : "";
 
     $ifdefs = "";
     for my $ptype ("fa", "gi") {
@@ -496,7 +498,7 @@ sub do_cisco_switch {
 		}
 	    }
 	    if($stormcontrolmode eq "on") {
-		if ($simple || $catalyst || $cbs) {
+		if ($simple || $catalyst || $cbs || $fifty) {
 		    $ifdefs .= "storm-control broadcast level 5\n";
 		    $ifdefs .= "storm-control multicast level 5\n";
 		    $ifdefs .= "storm-control unicast level 5\n";

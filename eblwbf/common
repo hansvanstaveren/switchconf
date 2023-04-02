@@ -6,18 +6,23 @@
 # For the aliases it is case insensitive
 #
 
-vlanbase 30
+#
+# vlanbase can vary per location
+# 30 was original number from 2011 in Veldhoven
+# Strasbourg and Marrakech are going to be 140
+#
+vlanbase 140
 
 vlan 0 MGMT
 vlan 1 SCORING
 vlan 2 EBLWBF
 vlan 3 BBO
-vlan 4 OTHERVIDEO
+vlan 4 BRIDGECARE
 vlan 5 GUEST
-vlan 6 SECUR
-vlan 7 MARIO
-vlan 8 SPARE
-vlan 9 OLDADMIN
+vlan 6 SPARE1
+vlan 7 SPARE2
+vlan 8 SPARE3
+vlan 9 SPARE4
 #
 # Extra VLAN's, not trunked
 #
