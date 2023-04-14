@@ -31,11 +31,11 @@ gswp10-8 18 cisco cbs250-8pp alltrunk
 gsw16-1 31 cisco sg300-20 alltrunk
 gsw16-2 32 cisco sg200-18 alltrunk
 gsw16-3 33 cisco sg300-20 alltrunk
-gsw16-4 34 cisco sg300-20 alltrunk
+gsw16-4 34 cisco sg300-20 test
 gsw16-5 35 cisco sg200-18 alltrunk
 gsw24-1 36 cisco sg200-26 alltrunk
 gsw24-2 37 cisco sg200-26 alltrunk
-gsw24-3 38 cisco sg250-26 alltrunk
+gsw24-3 38 cisco sg250-26 bridgecare stp:off
 gsw24-4 39 cisco sg200-26 alltrunk
 fs10-1 41 fs s1150 alltrunk
 fs10-2 42 fs s1150 hans8
@@ -52,7 +52,7 @@ gswp24-1 61 cisco sg300-28p alltrunk
 gswp24-2 62 cisco sg300-28p alltrunk
 gswp24-3 63 cisco sg300-28p alltrunk
 gswp24-4 64 cisco sg200-26p scoring24g
-gswp48-1 65 cisco sg200-50p six-vlan30 stp:off
+gswp48-1 65 cisco sg200-50p alltrunk stp:off
 gsw8-1 71 cisco cbs250-8t-d alltrunk
 gsw8-2 72 cisco cbs250-8t-d alltrunk
 gsw8-3 73 cisco cbs250-8t-d alltrunk
