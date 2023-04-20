@@ -19,7 +19,7 @@ vlan 2 EBLWBF
 vlan 3 BBO
 vlan 4 BRIDGECARE
 vlan 5 GUEST
-vlan 6 SPARE1
+vlan 6 LOVEBRIDGE
 vlan 7 SPARE2
 vlan 8 SPARE3
 vlan 9 SPARE4

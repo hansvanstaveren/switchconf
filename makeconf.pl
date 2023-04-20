@@ -358,6 +358,7 @@ sub do_cisco_switch {
     $catalyst = $host_ostype =~ /cat$/;
     $cbs = $host_ostype =~ /cbs$/;
     $fifty = $host_ostype =~ /fifty$/;
+    # print "hostname $hostname, cbs $cbs\n";
 
 
     my $template = $orig_template;
@@ -387,6 +388,7 @@ sub do_cisco_switch {
     if ($cbs) {
 	$vlandb .= "no ip routing\n";
     }
+    $vlandb .= "voice vlan state disabled\n";
     $template =~ s/VLANDB\n/$vlandb/;
 
     #
