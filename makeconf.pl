@@ -65,6 +65,7 @@ sub getset_credentials {
 sub file_error {
     my ($host, $if, $error) = @_;
 
+    print "File error $host $if $error\n";
     $host_error{$host} .= "$host($if): $error\n";
     $ferrors++;
     return "";
