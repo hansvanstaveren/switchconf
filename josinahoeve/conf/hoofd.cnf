@@ -1,0 +1,28 @@
+#
+# Hoofd switch in werkplaats
+# Porten 1-op-1 van patch naar switch voor poort 1-12 in ieder geval
+#
+
+#
+# Port 1 en 2 naar linker zolder
+#
+port gi1 starlink
+port gi2 trunk
+#
+# Port 3-5 middenzolder
+#
+port gi3 trunk
+port gi4 oldodilon
+port gi5 trunk
+#
+# Port 6-8 boven werkplaats
+#
+port gi6 trunk
+port gi7-8 iot
+#
+# Port 9-10 bij netwerkkast
+#
+port gi9 trunk
+port gi10 staff
+#
+port gi11- trunk

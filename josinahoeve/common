@@ -1,0 +1,29 @@
+#
+# Allowable VLANs and names
+# names will be entered as a synonym for an accessport
+# so "vlan 25 foo" will also do "alias foo a25"
+#
+# For the aliases it is case insensitive
+#
+
+vlanbase 10
+
+vlan 0 BACKBONE
+vlan 1 STAFF
+vlan 2 GUEST
+vlan 3 DCA
+vlan 4 WBF
+vlan 5 STARLINK
+vlan 6 RONALD
+vlan 7 IOT
+vlan 8 TELTONIKA
+vlan 9 OLDODILON
+
+adminvlan 0
+network 172.20.0
+
+alias trunk u0,t1-9
+
+# off, on or smart
+spanningtree on
+stormcontrol on

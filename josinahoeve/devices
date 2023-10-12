@@ -1,0 +1,22 @@
+#
+# All devices with IP address and HW-type
+#
+
+switch-hoofd 2 cisco sg500-28p hoofd
+switch-sg10poe 3 cisco sg300-10pp sg10
+switch-zolder 11 fs s3150 zolder
+switch-meterkast 12 fs s3150 meterkast
+switch-reserve 13 fs s3150 reserve
+switch-schuur 14 fs s3150 schuur
+switch-varkenskot 15 fs s3150 varkenskot stp:off
+switch-woonkamer 16 fs s3150 woonkamer
+switch-ronald 21 cisco lgs308mp ronald
+switch-poe26 22 cisco sg200-26 poe26
+switch-sg10 23 cisco sg300-10 zolder
+# switch-tplink 24 tp-link tl-sg2210p tplinktest
+switch-2960 24 cisco c2960 s2960
+switch-2960x 25 cisco c2960x s2960x
+switch-sg18 26 cisco sg200-18 sg18
+switch-328-1 43 cisco sg300-28 sg328
+switch-328-2 44 cisco sg300-28 sg328
+switch-328-3 45 cisco sg300-28 sg328

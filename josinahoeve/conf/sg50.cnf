@@ -1,0 +1,5 @@
+port gi1-6 oldodilon
+port gi25-30 starlink
+port gi7-12,gi31-36 staff
+port gi13-24,gi37-48 trunk
+port gi49-50 trunk
