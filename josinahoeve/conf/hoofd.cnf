@@ -25,4 +25,16 @@ port gi7-8 iot
 port gi9 trunk
 port gi10 staff
 #
-port gi11- trunk
+port gi11-22 trunk
+#
+# port 23 unifi cloudkey
+#
+port gi23 backbone
+#
+# port 24 Youless
+#
+port gi24 iot
+#
+# trunks
+#
+port gi25-28 trunk

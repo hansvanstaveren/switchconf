@@ -3,6 +3,8 @@
 #no warnings "experimental::smartmatch";
 use feature ':5.10';
 use experimental qw( switch );
+use Digest::MD5 qw(md5_hex);
+use MIME::Base64 qw(encode_base64);
 
 $file_types = "../types";
 $file_common = "common";
@@ -347,10 +349,15 @@ sub do_tplink_switch {
 sub do_cisco_switch {
     my ($hostname, $devindex, $host_type) = @_;
     my ($catalyst, $extended, $layer3, $simple, $poe, $linksys);
-    my ($cbs, $fifty);
+    my ($cbs, $twenty, $fifty);
 
+    #
     # Various differences between Cisco switches
     # They are not all the same....
+    #
+    # Especially the sg220 series is radical....
+    #
+
     $layer3 = $host_ostype =~ /^layer3/;
     $simple = $host_ostype =~ /simple/;
     $linksys = $host_ostype =~ /linksys/;
@@ -358,11 +365,21 @@ sub do_cisco_switch {
     $extended = $host_ostype =~ /3x/;
     $catalyst = $host_ostype =~ /cat$/;
     $cbs = $host_ostype =~ /cbs$/;
+    $twenty = $host_ostype =~ /twenty$/;
     $fifty = $host_ostype =~ /fifty$/;
-    # print "hostname $hostname, cbs $cbs\n";
+    # print "hostname $hostname, cbs $cbs, twenty $twenty, fifty $fifty\n";
 
 
     my $template = $orig_template;
+
+    #
+    # prepend header in case of sg220
+    #
+    $header = "";
+    if ($twenty) {
+	$header = "config-file-header\n$hostname\nv1.2.1.5\nCLI v1.0\n@\n";
+    }
+    $template =~ s/HEADER\n/$header/;
 
     #
     # Create vlan database command
@@ -370,7 +387,7 @@ sub do_cisco_switch {
     #
     # Set names here for simple switches
     #
-    unless($catalyst) {
+    unless($catalyst || $twenty) {
 	$vlandb = "vlan database\nvlan " .
 		join(',', sort{ $a <=> $b } keys %vlan_name) . "\n";
 	if ($simple) {
@@ -389,7 +406,7 @@ sub do_cisco_switch {
     if ($cbs) {
 	$vlandb .= "no ip routing\n";
     }
-    $vlandb .= "voice vlan state disabled\n";
+    $vlandb .= "voice vlan state disabled\n" unless ($twenty);
     $template =~ s/VLANDB\n/$vlandb/;
 
     #
@@ -398,7 +415,7 @@ sub do_cisco_switch {
     #
 
     my $vlandefs = "";
-    unless ($simple || $catalyst) {
+    unless ($simple || $catalyst || $twenty) {
 	for my $vlan (sort {$a <=> $b} keys %vlan_name) {
 	    $vlandefs .= "interface vlan $vlan\nname $vlan_name{$vlan}\n";
 	    if ($vlan == $mainvlanid) {
@@ -413,6 +430,13 @@ sub do_cisco_switch {
 	$vlandefs .= "interface vlan $mainvlanid\nno ip address dhcp\nip address $host_network.$host_ip 255.255.255.0\nexit\n";
 	$vlandefs .= "ip default-gateway $host_network.1\n";
     }
+    if ($twenty) {
+	$vlandefs .= "management-vlan vlan $mainvlanid\n";
+	$vlandefs .= "management vlan ip-address $host_network.$host_ip mask 255.255.255.0\n";
+	$vlandefs .= "no management vlan ip dhcp client\n";
+	$vlandefs .= "ip default-gateway $host_network.1\n";
+    }
+
     $template =~ s/VLANDEFS\n/$vlandefs/;
 
     #
@@ -437,6 +461,12 @@ sub do_cisco_switch {
 	}
     } else {
 	$stp_cmd = "no spanning-tree\n";
+    }
+    if ($twenty) {
+	# Sorry for the hack here, has nothing to do with spanning tree
+	$stp_cmd .= "storm-control unit pps\n";
+	$stp_cmd .= "no passwords complexity enable\n";
+	$stp_cmd .= "passwords aging 0\n";
     }
     $template =~ s/STP_PRIO\n/$stp_cmd/;
 
@@ -501,10 +531,11 @@ sub do_cisco_switch {
 		}
 	    }
 	    if($stormcontrolmode eq "on") {
-		if ($simple || $catalyst || $cbs || $fifty) {
+		if ($simple || $catalyst || $cbs || $twenty || $fifty) {
+		    my $pref = $twenty ? "unknown-" : "";
 		    $ifdefs .= "storm-control broadcast level 5\n";
-		    $ifdefs .= "storm-control multicast level 5\n";
-		    $ifdefs .= "storm-control unicast level 5\n";
+		    $ifdefs .= "storm-control ${pref}multicast level 5\n";
+		    $ifdefs .= "storm-control ${pref}unicast level 5\n";
 		} else {
 		    $ifdefs .= "storm-control broadcast enable\n";
 		    $ifdefs .= "storm-control broadcast level 5\n";
@@ -516,7 +547,7 @@ sub do_cisco_switch {
     }
     $template =~ s/IFDEFS\n/$ifdefs/;
 
-    $voice = $simple || $catalyst ? "" : $orig_voice;
+    $voice = $simple || $catalyst || $twenty ? "" : $orig_voice;
     $template =~ s/VOICE\n/$voice/;
 
     $hostcmd = "hostname $hostname";
@@ -529,10 +560,23 @@ sub do_cisco_switch {
     #
 
     $urest = $simple ? "override-complexity-check" : "privilege 15";
-    $confusername = "username $username $urest password $password\n"; 
+
+#   $secret_twenty = "";
+#   if ($host_flags =~ /secret:([^ ]*)/) {
+#	$secret_twenty = $1;
+#	print "hostname $hostname gets encrypted secret $secret_twenty\n";
+#   }
+    if ($twenty) {
+	# my $hex = md5_hex($password);
+	$secret_twenty = encode_base64(md5_hex($password), "");
+	# print "password $password, secret $secret_twenty\n";
+    }
+    $passwordstring = $twenty ? "secret $secret_twenty" : "password $password";
+    $confusername = "username $username $urest $passwordstring\n"; 
     $template =~ s/USERNAME\n/$confusername/;
 
-    $sshserver = $layer3  && !$catalyst ? "ip ssh server\nip ssh password-auth\nip telnet server\n" : "";
+    $sshserver = ($layer3 || $fifty)  && !$catalyst ? "ip ssh server\nip ssh password-auth\nip telnet server\n" : "";
+    $sshserver = "ip ssh server\nip telnet server\n" if ($twenty);
     $template =~ s/SSHSERVER\n/$sshserver/;
 
     if ($simple) {
@@ -541,7 +585,7 @@ sub do_cisco_switch {
 	if ($catalyst) {
 	    $snmp = $catalyst_snmp;
 	} else {
-	    $snmp = $layer3_snmp;
+	    $snmp = $twenty ? $twenty_snmp : $layer3_snmp;
 	}
     }
 
@@ -554,7 +598,8 @@ sub do_cisco_switch {
     if ($simple || $linksys) {
 	$banner = "";
     } else {
-	$banner = "banner login #\nWBF Championship switch\nNo idle browsing or worse\n#\n";
+	my $uch = uc($hostname);
+	$banner = "banner login #\n$uch\nWBF Championship switch\nNo idle browsing or worse\n#\n";
     }
 
     if ($simple) {
@@ -573,9 +618,13 @@ sub do_cisco_switch {
 	    $sntp .= "\n";			# zone
 	}
 	$sntp .= "clock source sntp\n";
-	$sntp .= "sntp unicast client enable\n";
-	$sntp .= "sntp unicast client poll\n";
-	$sntp .= "sntp server $host_network.1 poll\n";
+	if ($twenty) {
+	    $sntp .= "sntp server $host_network.1 port 123\n";
+	} else {
+	    $sntp .= "sntp unicast client enable\n";
+	    $sntp .= "sntp unicast client poll\n";
+	    $sntp .= "sntp server $host_network.1 poll\n";
+	}
     }
     if ($catalyst) {
 	$sntp .= "ntp peer $host_network.1\n";
@@ -595,7 +644,7 @@ sub do_cisco_switch {
     $template =~ s/VTY\n/$vtydefs/;
 
     # change to DOS format
-    $template =~ s/\n/\r\n/g;
+    $template =~ s/\n/\r\n/g unless ($twenty);
 
     return $template;
 }
@@ -837,12 +886,21 @@ snmp-server community public ro view Default
 ip http secure-server
 END3SNMP
 
+$twenty_snmp = <<END3SNMP ;
+snmp-server
+snmp-server location "WBF Championship"
+snmp-server contact "Hans van Staveren <sater\@xs4all.nl>"
+snmp-server community public view Default ro
+ip http secure-server
+END3SNMP
+
 $layer2_snmp = <<END2SNMP ;
 set location "WBF Championship"
 set contact "Hans van Staveren <sater\@xs4all.nl>"
 END2SNMP
 
 $orig_template = <<ENDTEMPLATE ;
+HEADER
 VLANDB
 CONFIGURE
 STP_PRIO
@@ -970,7 +1028,7 @@ while(<DEVFILE>) {
     my ($name, $addr, $manuf, $type, $ifile, $flags) = split;
     # print "$name has ip-addr $addr and is a $manuf $type switch, conf on $ifile, flags $flags\n";
     if ($name_use{$name}) {
-	die "Illegal re-use of $name";
+	die "Illegal re-use of name $name";
     }
     $name_use{$name} = 1;
     my $network, $netname, $netaddr;
@@ -989,7 +1047,7 @@ while(<DEVFILE>) {
     #print "$name has netid $netid, au=$au\n";
 
     if ($au) {
-	die "Illegal re-use of $netid";
+	die "Illegal re-use of ip-address $netaddr";
     }
     $addr_use{$netid} = 1;
 

@@ -1,0 +1,8 @@
+port gi1 mgmt
+port gi2 scoring
+port gi3 eblwbf
+port gi4 bbo
+port gi5 bridgecare
+port gi6 guest
+port gi7 lovebridge
+port gi8- trunk
