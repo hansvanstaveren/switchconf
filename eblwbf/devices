@@ -8,14 +8,14 @@ gsw10-1 4 cisco sg300-sf alltrunk
 # local airmax 6 admin/netman-wbf123
 # remote airmax 7
 swp12-1 10 cisco c2960c-12 alltrunk
-gswp10-1 11 cisco cbs250-8pp alltrunk
-gswp10-2 12 cisco cbs250-8pp alltrunk
-gswp10-3 13 cisco cbs250-8pp alltrunk
+gswp10-1 11 cisco cbs250-8pp allscoring6
+gswp10-2 12 cisco cbs250-8pp allscoring6
+gswp10-3 13 cisco cbs250-8pp allscoring6
 gswp10-4 14 cisco cbs250-8pp alltrunk
-gswp10-5 15 cisco cbs250-8pp TignesLovebridge
-gswp10-6 16 cisco cbs250-8pp TignesTraian
-gswp10-7 17 cisco cbs250-8pp TignesBBO
-gswp10-8 18 cisco cbs250-8pp alltrunk
+gswp10-5 15 cisco cbs250-8pp StrasbJurica
+gswp10-6 16 cisco cbs250-8pp alltrunk
+gswp10-7 17 cisco cbs250-8pp HuezLovebridge
+gswp10-8 18 cisco cbs250-8pp StrasbLovebridge
 #sw8-1 21 cisco sf302-08 allscoring
 #sw8-2 22 cisco sf302-08 allscoring
 #sw8-3 23 cisco sf302-08 mario10
@@ -30,13 +30,13 @@ gswp10-8 18 cisco cbs250-8pp alltrunk
 #gsw8old-4 34 cisco sg200-08 alltrunk
 gsw16-1 31 cisco sg300-20 alltrunk
 gsw16-2 32 cisco sg200-18 alltrunk
-gsw16-3 33 cisco sg300-20 alltrunk
-gsw16-4 34 cisco sg300-20 scoring16
-gsw16-5 35 cisco sg200-18 alltrunk
+gsw16-3 33 cisco sg300-20 StrasbFotis
+gsw16-4 34 cisco sg300-20 MarrakGeorgi
+gsw16-5 35 cisco sg200-18 HuezTraian
 gsw24-1 36 cisco sg200-26 alltrunk
 gsw24-2 37 cisco sg200-26 alltrunk
-gsw24-3 38 cisco sg250-26 bridgecare stp:off
-gsw24-4 39 cisco sg200-26 alltrunk
+gsw24-3 38 cisco sg250-26 scoring24
+gsw24-4 39 cisco sg200-26 StrasbGeorgi stp:off
 fs10-1 41 fs s1150 alltrunk
 fs10-2 42 fs s1150 alltrunk
 fs10-3 43 fs s1150 alltrunk
@@ -51,16 +51,16 @@ spare-poe 53 cisco lgs308mp testcam
 gswp24-1 61 cisco sg300-28p alltrunk
 gswp24-2 62 cisco sg300-28p alltrunk
 gswp24-3 63 cisco sg300-28p alltrunk
-gswp24-4 64 cisco sg200-26p scoring24g
+gswp24-4 64 cisco sg200-26p VeldhoITRoom
 gswp48-1 65 cisco sg200-50p alltrunk stp:off
 gsw8-1 71 cisco cbs250-8t-d scoring7
 gsw8-2 72 cisco cbs250-8t-d scoring7
 gsw8-3 73 cisco cbs250-8t-d scoring7
 gsw8-4 74 cisco cbs250-8t-d scoring7
-gsw8-5 75 cisco cbs250-8t-d alltrunk
-gsw8-6 76 cisco cbs250-8t-d alltrunk
-gsw8-7 77 cisco cbs250-8t-d alltrunk
-gsw8-8 78 cisco cbs250-8t-d alltrunk
+gsw8-5 75 cisco cbs250-8t-d allscoringbut1
+gsw8-6 76 cisco cbs250-8t-d StrasbScoring
+gsw8-7 77 cisco cbs250-8t-d StrasbRegistration
+gsw8-8 78 cisco cbs250-8t-d scoring7
 gsw8-11 81 cisco sg200-08 alltrunk
 gsw8-12 82 cisco sg200-08 alltrunk
 gsw8-13 83 cisco sg200-08 alltrunk
