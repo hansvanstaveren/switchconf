@@ -572,7 +572,8 @@ sub do_cisco_switch {
 	# print "password $password, secret $secret_twenty\n";
     }
     $passwordstring = $twenty ? "secret $secret_twenty" : "password $password";
-    $confusername = "username $username $urest $passwordstring\n"; 
+    $confusername = "passwords aging 0\n";
+    $confusername .= "username $username $urest $passwordstring\n"; 
     $template =~ s/USERNAME\n/$confusername/;
 
     $sshserver = ($layer3 || $fifty)  && !$catalyst ? "ip ssh server\nip ssh password-auth\nip telnet server\n" : "";
