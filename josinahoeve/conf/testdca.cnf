@@ -1,0 +1,4 @@
+port fa1-12 wbf
+port fa13-18 dca
+port fa19-24 trunk
+port gi1-4 trunk

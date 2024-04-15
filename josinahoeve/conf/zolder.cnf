@@ -1,0 +1,4 @@
+port gi1 trunk
+port gi2 backbone # Asus outside
+port gi3-4 oldodilon
+port gi5-10 trunk

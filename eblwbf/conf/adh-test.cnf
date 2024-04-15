@@ -1,0 +1,12 @@
+port gi1 mgmt
+port gi2 scoring
+port gi3 eblwbf
+port gi4 bbo
+port gi5 bridgecare
+port gi6 guest
+port gi7 lovebridge
+port gi8-22 trunk
+port gi23-24 nt_wan
+port gi25 trunk
+port gi26 nt_wan
+port gi27-28 trunk
