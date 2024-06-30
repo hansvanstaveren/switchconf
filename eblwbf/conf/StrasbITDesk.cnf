@@ -1,0 +1,9 @@
+port gi1 SCORING
+port gi2 EBLWBF
+port gi3 BBO
+port gi4 BRIDGECARE
+port gi5 GUEST
+port gi6 LOVEBRIDGE
+port gi7 SPARE2
+port gi8 SPARE3
+port gi9- trunk

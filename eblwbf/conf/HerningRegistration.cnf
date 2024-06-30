@@ -1,0 +1,4 @@
+port gi1 trunk
+port gi2-8 scoring
+port gi9-10 trunk
+
