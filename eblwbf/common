@@ -20,8 +20,8 @@ vlan 3 BBO
 vlan 4 BRIDGECARE
 vlan 5 GUEST
 vlan 6 LOVEBRIDGE
-vlan 7 SPARE2
-vlan 8 SPARE3
+vlan 7 SCORING2BE
+vlan 8 GATEWAY2
 vlan 9 SPARE4
 #
 # Extra VLAN's, not trunked
