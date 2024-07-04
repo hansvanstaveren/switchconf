@@ -1,7 +1,12 @@
 #
 # All devices with IP address and HW-type
 #
+# "Gino" switch
 gsw10-1 4 cisco sg300-sf alltrunk
+#
+# Point to point wireless stuff
+# Probably never used, actually owned by Hans
+#
 # local airmax 6 admin/netman-wbf123
 # remote airmax 7
 swp12-1 10 cisco c2960c-12 alltrunk
