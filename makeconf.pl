@@ -682,6 +682,11 @@ sub do_switch {
     $host_int{"gi"} = $hw_gi{$devindex};
     $host_ostype = $hw_os{$devindex};
 
+    if ($hw_fa{$devindex} eq "") {
+	file_error($hostname, $ifile, "unknown type $devindex");
+	return;
+    }
+
     # print "devindex=$devindex, network=$host_network, fa=", $host_int{"fa"}, ",gi=", $host_int{"gi"} , "\n";
 
     #
@@ -822,7 +827,8 @@ sub do_switch {
 		#
 		$portvlan{"$port:$2"} = $1;
 
-		given("$1$usage") {
+		# Was "given"
+		for ("$1$usage") {
 		    # First for unused so far
 		    when (/^.$/) { $usage = $_; }
 		    when (/^ut$/)    { $usage = "u"; }

@@ -20,6 +20,12 @@ gswp10-6 16 cisco cbs250-8pp HernAudio
 gswp10-7 17 cisco cbs250-8pp HernLovebridge
 gswp10-8 18 cisco cbs250-8pp allscoring6
 #
+prg-1 21 cisco sg300-28mp alltrunk
+prg-2 22 cisco sg300-28pp alltrunk
+prg-3 23 cisco sg200-26 alltrunk
+prg-5 25 cisco sf200-24fp alltrunk
+prg-9 29 fs s3150 alltrunk
+#
 gsw16-1 31 cisco sg300-20 HernBboScoring
 gsw16-2 32 cisco sg200-18 alltrunk
 gsw16-3 33 cisco sg300-20 StrasbFotis
