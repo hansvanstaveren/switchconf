@@ -35,6 +35,7 @@ type cisco sg200-18 0 18 layer2
 type cisco sg200-26 0 26 layer2
 type cisco sg220-26p 0 26 layer2poetwenty
 type cisco sg220-28mp 0 28 layer2poetwenty
+type cisco sg250-18 0 18 layer2hdrfifty
 type cisco sg250-26 0 26 layer2fifty
 type cisco sg200-26p 0 26 layer2poe
 type cisco sg200-50p 0 50 layer2poe
