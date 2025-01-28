@@ -26,6 +26,8 @@ prg-3 23 cisco sg200-26 alltrunk
 prg-4 24 cisco sg250-18 testspecial
 prg-5 25 cisco sf200-24fp alltrunk
 prg-6 26 cisco sg300-10 alltrunk
+prg-7 27 cisco sg300-28mp alltrunk
+prg-8 28 cisco sg300-28pp alltrunk
 prg-9 29 fs s3150 alltrunk
 #
 gsw16-1 31 cisco sg300-20 HernBboScoring
