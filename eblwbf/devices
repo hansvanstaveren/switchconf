@@ -1,68 +1,82 @@
 #
 # All devices with IP address and HW-type
 #
+# "Gino" switch
 gsw10-1 4 cisco sg300-sf alltrunk
+#
+# Point to point wireless stuff
+# Probably never used, actually owned by Hans
+#
 # local airmax 6 admin/netman-wbf123
 # remote airmax 7
 swp12-1 10 cisco c2960c-12 alltrunk
+#
 gswp10-1 11 cisco cbs250-8pp alltrunk
-gswp10-2 12 cisco cbs250-8pp WrocScoBridgecare2 stp:off
-gswp10-3 13 cisco cbs250-8pp BuenoVG
+gswp10-2 12 cisco cbs250-8pp HernVuegraph
+gswp10-3 13 cisco cbs250-8pp allscoring6
 gswp10-4 14 cisco cbs250-8pp HerningRegistration
 gswp10-5 15 cisco cbs250-8pp HernAudio
 gswp10-6 16 cisco cbs250-8pp HernAudio
 gswp10-7 17 cisco cbs250-8pp HernLovebridge
-gswp10-8 18 cisco cbs250-8pp alltrunk
-#sw8-1 21 cisco sf302-08 allscoring
-#sw8-2 22 cisco sf302-08 allscoring
-#sw8-3 23 cisco sf302-08 mario10
-#sw8-4 24 cisco sf302-08 allscoring
-#sw8-5 25 cisco sf302-08 allscoring
-#sw8-6 26 cisco sf302-08 traian
-#sw8-7 27 cisco sf302-08 alltrunk
-#sw8-8 28 cisco sf302-08 alltrunk
-#gsw8old-1 31 cisco sg200-08 alltrunk
-#gsw8old-2 32 cisco sg200-08 alltrunk
-#gsw8old-3 33 cisco sg200-08 alltrunk
-#gsw8old-4 34 cisco sg200-08 alltrunk
-gsw16-1 31 cisco sg300-20 ScoBCare
-gsw16-2 32 cisco sg200-18 ScoBCare
+gswp10-8 18 cisco cbs250-8pp allscoring6
+#
+prg-1 21 cisco sg300-28mp alltrunk
+prg-2 22 cisco sg300-28pp alltrunk
+prg-3 23 cisco sg200-26 alltrunk
+prg-4 24 cisco sg250-18 testspecial
+prg-5 25 cisco sf200-24fp alltrunk
+prg-6 26 cisco sg300-10 testspecial
+prg-7 27 cisco sg300-28mp alltrunk
+prg-8 28 cisco sg300-28pp alltrunk
+prg-9 29 fs s3150 alltrunk
+#
+gsw16-1 31 cisco sg300-20 HernBboScoring
+gsw16-2 32 cisco sg200-18 alltrunk
 gsw16-3 33 cisco sg300-20 StrasbFotis
-gsw16-4 34 cisco sg300-20 podium
+gsw16-4 34 cisco sg300-20 MarrakGeorgi
 gsw16-5 35 cisco sg200-18 HuezTraian
 gsw24-1 36 cisco sg200-26 alltrunk
 gsw24-2 37 cisco sg200-26 alltrunk
 gsw24-3 38 cisco sg250-26 scoring24
 gsw24-4 39 cisco sg200-26 StrasbGeorgi stp:off
+#
 fs10-1 41 fs s1150 scoring4
 fs10-2 42 fs s1150 alltrunk
 fs10-3 43 fs s1150 alltrunk
 fs10-4 44 fs s1150 alltrunk
 fs10-5 45 fs s1150 tv
 fs10-6 46 fs s1150 alltrunk
-fs10-7 47 fs s1150 tvWroclaw
-fs10-8 48 fs s1150 tvWroclaw
+fs10-7 47 fs s1150 tv
+fs10-8 48 fs s1150 tv
+#
+# Next group will probably remain unused
 #
 box1-sw 51 cisco lgs308mp testlinksys
 box2-sw 52 cisco lgs308mp testlinksys
 spare-poe 53 cisco lgs308mp testcam
+prg-11 56 fs s3150 alltrunk
+prg-12 57 fs s3150 alltrunk
+prg-13 58 fs s3150 alltrunk
+prg-14 59 fs s3150 alltrunk
+#
+# Probably put 48 port switch(es) in other group
 #
 gswp24-1 61 cisco sg300-28p alltrunk
 gswp24-2 62 cisco sg300-28p WroclawMain
 gswp24-3 63 cisco sg300-28p alltrunk
 gswp24-4 64 cisco sg200-26p VeldhoITRoom
-gswp48-1 68 cisco sg200-50p alltrunk stp:off
 gswp24-5 65 cisco sg300-28p alltrunk
-gswp24-6 66 cisco sg220-26p WrocScoBridgecare stp:off
+gswp24-6 66 cisco sg220-26p alltrunk
 gswp24-7 67 cisco sg220-28mp alltrunk
+gswp48-1 68 cisco sg200-50p alltrunk stp:off
 #
-gsw8-1 71 cisco cbs250-8t-d care7
+gsw8-1 71 cisco cbs250-8t-d scoring7
 gsw8-2 72 cisco cbs250-8t-d scoring7
 gsw8-3 73 cisco cbs250-8t-d scoring7
-gsw8-4 74 cisco cbs250-8t-d BuenoSBL
-gsw8-5 75 cisco cbs250-8t-d MarkHorton
+gsw8-4 74 cisco cbs250-8t-d scoring7
+gsw8-5 75 cisco cbs250-8t-d allscoringbut1
 gsw8-6 76 cisco cbs250-8t-d StrasbScoring
-gsw8-7 77 cisco cbs250-8t-d care7
+gsw8-7 77 cisco cbs250-8t-d alltrunk
 gsw8-8 78 cisco cbs250-8t-d scoring7
 gsw8-11 81 cisco sg200-08 alltrunk
 gsw8-12 82 cisco sg200-08 alltrunk

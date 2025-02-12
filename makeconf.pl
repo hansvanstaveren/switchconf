@@ -349,7 +349,7 @@ sub do_tplink_switch {
 sub do_cisco_switch {
     my ($hostname, $devindex, $host_type) = @_;
     my ($catalyst, $extended, $layer3, $simple, $poe, $linksys);
-    my ($cbs, $twenty, $fifty);
+    my ($cbs, $twenty, $fifty, $confheader);
 
     #
     # Various differences between Cisco switches
@@ -367,7 +367,8 @@ sub do_cisco_switch {
     $cbs = $host_ostype =~ /cbs$/;
     $twenty = $host_ostype =~ /twenty$/;
     $fifty = $host_ostype =~ /fifty$/;
-    # print "hostname $hostname, cbs $cbs, twenty $twenty, fifty $fifty\n";
+    $confheader = $host_ostype =~ /hdr/;
+    # print "hostname $hostname, cbs $cbs, twenty $twenty, fifty $fifty, confheader $confheader\n";
 
 
     my $template = $orig_template;
@@ -378,8 +379,13 @@ sub do_cisco_switch {
     $header = "";
     if ($twenty) {
 	$header = "config-file-header\n$hostname\nv1.2.1.5\nCLI v1.0\n@\n";
+    } elsif ($confheader) {
+	$header = "config-file-header\n$hostname\nv2.4.5.71 / RTESLA2.4.5_930_181_144\nCLI v1.0\nfile SSD indicator excluded\n@\n!\nunit-type-control-start\nunit-type unit 1 network gi uplink none\nunit-type-control-end\n!\n";
     }
     $template =~ s/HEADER\n/$header/;
+    if (0 && $header) {
+	print "Header for $hostname:\n$header";
+    }
 
     #
     # Create vlan database command
@@ -500,6 +506,8 @@ sub do_cisco_switch {
 		#
 		my $addcmd = $catalyst ? "" : "add";
 
+		my @vlannumbers = ();
+
 		for $vlan (sort keys %vlan_name) {
 		    my $pv = $portvlan{"$port:$vlan"};
 		    #
@@ -509,25 +517,37 @@ sub do_cisco_switch {
 		    #
 		    # It is, add definition
 		    #
+		    $settrunk = "switchport mode trunk\n";
+		    if (0 && $fifty) {
+			$settrunk .= "switchport trunk allowed vlan except 1-4000\n";
+		    }
 		    if ($pv eq "a") {
 			$ifdefs .= "switchport mode access\n" if ($portmode eq "");
 			$portmode = "a";
 			$ifdefs .= "switchport access vlan $vlan\n";
 		    } elsif ($pv eq "t") {
 			# $ifdefs .= "switchport trunk encapsulation dot1q\n" if ($catalyst && $portmode eq "");
-			$ifdefs .= "switchport mode trunk\n" if ($portmode eq "");
+			$ifdefs .= $settrunk if ($portmode eq "");
 			$portmode = "t";
-			$ifdefs .= "switchport trunk allowed vlan $addcmd $vlan\n";
+			push(@vlannumbers, $vlan);
+	    		# print "vlannumbers: @vlannumbers\n" if($fifty);
+			$ifdefs .= "switchport trunk allowed vlan $addcmd $vlan\n" unless($fifty);;
 			$addcmd = "add";
 		    } elsif ($pv eq "u") {
 			# $ifdefs .= "switchport trunk encapsulation dot1q\n" if ($catalyst && $portmode eq "");
-			$ifdefs .= "switchport mode trunk\n" if ($portmode eq "");
+			$ifdefs .= $settrunk if ($portmode eq "");
 			$portmode = "t";
-			$ifdefs .= "switchport trunk allowed vlan $addcmd $vlan\n";
+			push(@vlannumbers, $vlan);
+	    		# print "vlannumbers: @vlannumbers\n" if($fifty);
+			$ifdefs .= "switchport trunk allowed vlan $addcmd $vlan\n" unless($fifty);;
 			$addcmd = "add";
 			my $sepchar = $simple ? "-" : " ";
 			$ifdefs .= "switchport trunk native${sepchar}vlan $vlan\n";
 		    }
+		}
+		# print "to be confed vlannumbers: @vlannumbers\n" if($fifty);
+		if ($fifty && $vlannumbers[0]) {
+		    $ifdefs .= "switchport trunk allowed vlan add " . join(",", @vlannumbers) . "\n";
 		}
 	    }
 	    if($stormcontrolmode eq "on") {
@@ -682,6 +702,11 @@ sub do_switch {
     $host_int{"gi"} = $hw_gi{$devindex};
     $host_ostype = $hw_os{$devindex};
 
+    if ($hw_fa{$devindex} eq "") {
+	file_error($hostname, $ifile, "unknown type $devindex");
+	return;
+    }
+
     # print "devindex=$devindex, network=$host_network, fa=", $host_int{"fa"}, ",gi=", $host_int{"gi"} , "\n";
 
     #
@@ -822,7 +847,8 @@ sub do_switch {
 		#
 		$portvlan{"$port:$2"} = $1;
 
-		given("$1$usage") {
+		# Was "given"
+		for ("$1$usage") {
 		    # First for unused so far
 		    when (/^.$/) { $usage = $_; }
 		    when (/^ut$/)    { $usage = "u"; }
