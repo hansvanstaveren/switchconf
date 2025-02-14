@@ -1,0 +1,4 @@
+port gi1-8 scoring
+port gi9-12 trunk
+port gi13-20 bridgecare
+port gi21- trunk
