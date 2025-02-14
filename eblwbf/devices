@@ -23,7 +23,6 @@ gswp10-8 18 cisco cbs250-8pp HerningRegistration
 prg-1 21 cisco sg300-28mp alltrunk
 prg-2 22 cisco sg300-28pp alltrunk
 prg-3 23 cisco sg200-26 alltrunk
-# backhome prg-4 24 cisco sg250-18 testspecial
 # backhome prg-5 25 cisco sf200-24fp alltrunk
 # backhome prg-6 26 cisco sg300-10 testspecial
 prg-7 27 cisco sg300-28mp alltrunk
