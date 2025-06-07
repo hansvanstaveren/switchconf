@@ -10,8 +10,9 @@
 # vlanbase can vary per location
 # 30 was original number from 2011 in Veldhoven
 # Strasbourg and Marrakech are going to be 140
+# Poznan goes to 170
 #
-vlanbase 140
+vlanbase 170
 
 vlan 0 MGMT
 vlan 1 SCORING

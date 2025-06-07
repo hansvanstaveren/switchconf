@@ -4,6 +4,6 @@ port gi3 BBO
 port gi4 BRIDGECARE
 port gi5 GUEST
 port gi6 LOVEBRIDGE
-port gi7 147
-port gi8 148
+port gi7 177
+port gi8 178
 port gi9- trunk
