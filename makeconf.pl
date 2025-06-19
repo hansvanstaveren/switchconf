@@ -596,7 +596,8 @@ sub do_cisco_switch {
     $confusername .= "username $username $urest $passwordstring\n"; 
     $template =~ s/USERNAME\n/$confusername/;
 
-    $sshserver = ($layer3 || $fifty)  && !$catalyst ? "ip ssh server\nip ssh password-auth\nip telnet server\n" : "";
+    # $sshserver = ($layer3 || $fifty)  && !$catalyst ? "ip ssh server\nip ssh password-auth\nip telnet server\n" : "";
+    $sshserver = $layer3 && !$catalyst ? "ip ssh server\nip ssh password-auth\nip telnet server\n" : "";
     $sshserver = "ip ssh server\nip telnet server\n" if ($twenty);
     $template =~ s/SSHSERVER\n/$sshserver/;
 
