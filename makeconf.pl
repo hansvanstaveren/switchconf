@@ -429,7 +429,7 @@ sub do_cisco_switch {
 	    }
 	    $vlandefs .= "exit\n";
 	}
-	$vlandefs .= "macro auto disabled\n";
+	$vlandefs .= "macro auto disabled\n" unless($linksys);
 	$vlandefs .= "ip default-gateway $host_network.1\n";
     }
     if ($catalyst) {
@@ -592,7 +592,7 @@ sub do_cisco_switch {
 	# print "password $password, secret $secret_twenty\n";
     }
     $passwordstring = $twenty ? "secret $secret_twenty" : "password $password";
-    $confusername = "passwords aging 0\n";
+    $confusername = $linksys ? "" :"passwords aging 0\n";
     $confusername .= "username $username $urest $passwordstring\n"; 
     $template =~ s/USERNAME\n/$confusername/;
 
