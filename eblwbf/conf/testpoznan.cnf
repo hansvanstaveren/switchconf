@@ -1,0 +1,7 @@
+port gi1 MGMT
+port gi2 SCORING
+port gi3 EBLWBF
+port gi4 BRIDGECARE
+port gi5 GUEST
+port gi6 LOVEBRIDGE
+port gi7- trunk
