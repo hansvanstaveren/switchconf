@@ -33,7 +33,7 @@ bc32n 32 cisco sg200-18 lovebridge16
 bc33n 33 cisco sg300-20 StrasbFotis
 bc34n 34 cisco sg200-26 StrasbGeorgi stp:off
 # Hans
-bc39n 39 cisco sg250-18 alltrunk
+bc39n 39 cisco sg250-18 testherning
 #
 # Lost switches?
 #
