@@ -10,9 +10,9 @@
 #
 # Black Cisco POE
 #
-bc11p 11 cisco sg200-50p alltrunk
+bc11p 11 cisco sg200-50p aptrunk
 bc12p 12 cisco sg300-28p WroclawMain
-bc13p 13 cisco sg300-28mp alltrunk
+bc13p 13 cisco sg300-28mp specialEsposizioni
 bc14p 14 cisco sg220-28mp alltrunk
 bc15p 15 cisco sg300-28p alltrunk
 bc16p 16 cisco sg220-26p alltrunk
@@ -44,10 +44,10 @@ bc40f 40 cisco sg300-sf alltrunk
 #
 # FS 8-port POE switches
 #
-fs41p 41 fs s1150 scoring4
-fs42p 42 fs s1150 alltrunk
-fs43p 43 fs s1150 alltrunk
-fs44p 44 fs s1150 alltrunk
+fs41p 41 fs s1150 tv
+fs42p 42 fs s1150 tv
+fs43p 43 fs s1150 tv
+fs44p 44 fs s1150 tv
 fs45p 45 fs s1150 tv
 fs46p 46 fs s1150 tv
 fs47p 47 fs s1150 tv
@@ -55,8 +55,8 @@ fs48p 48 fs s1150 tv
 #
 # Next group will probably remain unused, but they work
 #
-ls51p 51 cisco lgs308mp alltrunk
-ls52p 52 cisco lgs308mp alltrunk
+ls51p 51 cisco lgs308mp alltrunk1ap
+ls52p 52 cisco lgs308mp alltrunk1ap
 ls53p 53 cisco lgs308mp alltrunk
 #
 # White Cisco's POE in
@@ -76,7 +76,7 @@ wc81p 81 cisco cbs250-8pp alltrunk
 wc82p 82 cisco cbs250-8pp HernVuegraph
 wc83p 83 cisco cbs250-8pp allscoring6
 wc84p 84 cisco cbs250-8pp HerningRegistration
-wc85p 85 cisco cbs250-8pp HerningRegistration
+wc85p 85 cisco cbs250-8pp scoring1aptrunk
 wc86p 86 cisco cbs250-8pp HerningRegistration
 wc87p 87 cisco cbs250-8pp HernLovebridge
 wc88p 88 cisco cbs250-8pp HerningRegistration
