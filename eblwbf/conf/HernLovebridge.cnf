@@ -1,3 +1,4 @@
 port gi1-6 lovebridge
-port gi7- trunk
+port gi7 aptrunk
+port gi8- trunk
 
