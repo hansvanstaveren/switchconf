@@ -37,8 +37,8 @@ adminvlan 0
 network 172.16.0,savoy:172.17.0
 
 alias trunk u0,t1-9
-alias aptrunk u0,t2,t4,t7
-alias xwifitrunk t2,t4,t5,t6
+alias aptrunk u0,t2,t4,t6
+alias extwifitrunk t2,t4,t5,t6
 
 # off, on or smart
 spanningtree on

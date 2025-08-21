@@ -13,9 +13,9 @@
 bc11p 11 cisco sg200-50p aptrunk
 bc12p 12 cisco sg300-28p WroclawMain
 bc13p 13 cisco sg300-28mp specialEsposizioni
-bc14p 14 cisco sg220-28mp alltrunk
+bc14p 14 cisco sg220-28mp HerningMain
 bc15p 15 cisco sg300-28p alltrunk
-bc16p 16 cisco sg220-26p alltrunk
+bc16p 16 cisco sg220-26p HerningBack
 bc17p 17 cisco sg200-26p VeldhoITRoom
 bc18p 18 cisco sg300-28pp alltrunk
 bc19p 19 cisco sg300-28pp alltrunk
@@ -25,15 +25,15 @@ bc20p 20 cisco sg300-28p alltrunk
 #
 bc26n 26 cisco sg250-26 scoring24
 bc27n 27 cisco sg300-20 HernBboScoring
-bc28n 28 cisco sg300-20 MarrakGeorgi
+bc28n 28 cisco sg300-20 allguest
 bc29n 29 cisco sg200-18 HuezTraian
-bc30n 30 cisco sg200-26 alltrunk
+bc30n 30 cisco sg200-26 HernBBReg
 bc31n 31 cisco sg200-26 alltrunk
 bc32n 32 cisco sg200-18 lovebridge16
 bc33n 33 cisco sg300-20 StrasbFotis
 bc34n 34 cisco sg200-26 StrasbGeorgi stp:off
 # Hans
-bc39n 39 cisco sg250-18 testherning
+bc39n 39 cisco sg250-18 alltrunk
 #
 # Lost switches?
 #
@@ -67,10 +67,10 @@ ls53p 53 cisco lgs308mp alltrunk
 # White Cisco's POE in
 #
 wc71i 71 cisco cbs250-8t-d scoring7
-wc72i 72 cisco cbs250-8t-d scoring7
+wc72i 72 cisco cbs250-8t-d scoring6pluscare
 wc73i 73 cisco cbs250-8t-d scoring7
-wc74i 74 cisco cbs250-8t-d scoring7
-wc75i 75 cisco cbs250-8t-d allscoringbut1
+wc74i 74 cisco cbs250-8t-d HernBboScoCare
+wc75i 75 cisco cbs250-8t-d HernBboScoCare
 wc76i 76 cisco cbs250-8t-d StrasbScoring
 wc77i 77 cisco cbs250-8t-d scoring7
 wc78i 78 cisco cbs250-8t-d scoring7

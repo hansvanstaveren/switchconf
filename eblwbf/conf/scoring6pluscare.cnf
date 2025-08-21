@@ -1,0 +1,4 @@
+# Specifically for POE powered Cisco switches
+port gi1 trunk
+port gi2-7 scoring
+port gi8 bridgecare

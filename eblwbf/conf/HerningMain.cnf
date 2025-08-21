@@ -1,0 +1,5 @@
+port gi1-11 trunk
+port gi12 extwifitrunk
+port gi13-20 trunk
+port gi21-24 lovebridge
+port gi25- trunk
