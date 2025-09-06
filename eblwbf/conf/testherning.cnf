@@ -1,0 +1,11 @@
+#
+# For test switch Herning
+#
+port gi1-7 trunk
+port gi8 xwifitrunk
+port gi9 eblwbf
+port gi10 bridgecare
+port gi11 guest
+port gi12 lovebridge
+port gi13-16 lovebridge
+port gi17-18 trunk

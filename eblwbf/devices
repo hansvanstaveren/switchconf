@@ -33,6 +33,7 @@ bc32n 32 cisco sg200-18 lovebridge16
 bc33n 33 cisco sg300-20 StrasbFotis
 bc34n 34 cisco sg200-26 StrasbGeorgi stp:off
 # Hans
+bc38n 38 cisco sg300-10 alltrunk
 bc39n 39 cisco sg250-18 alltrunk
 #
 # Lost switches?
@@ -55,8 +56,8 @@ fs46p 46 fs s1150 tv
 fs47p 47 fs s1150 tv
 fs48p 48 fs s1150 tv
 # Hans
-fs49p 49 fs s3150 testpoznan
-fs50p 50 fs s3150 testpoznan
+fs49p 49 fs s3150 alltrunk
+fs50p 50 fs s3150 alltrunk
 #
 # Next group will probably remain unused, but they work
 #
@@ -88,3 +89,6 @@ wc88p 88 cisco cbs250-8pp HerningRegistration
 #
 # From 90 on other devices
 #
+# 90 management?
+# 93 Omada controller
+# 95 Unifi controller?

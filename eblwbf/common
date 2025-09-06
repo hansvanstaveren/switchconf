@@ -35,6 +35,7 @@ vlan 14 NT_SPARE4
 
 adminvlan 0
 network 172.16.0,savoy:172.17.0
+logserver 172.16.0.95
 
 alias trunk u0,t1-9
 alias aptrunk u0,t2,t4,t6

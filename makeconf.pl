@@ -19,6 +19,7 @@ $username = "admin";
 $password = "admin";
 
 $timezone = "";
+$log_server = "";
 
 $ferrors = 0;
 
@@ -1036,6 +1037,10 @@ while(<COMMON>) {
 	$credentials_set = 1;
 	$username = $rest[0];
 	$password = $rest[1];
+	next;
+    }
+    if ($keyw eq "logserver") {
+	$log_server = $rest;
 	next;
     }
     die "$keyw not recognized";
