@@ -368,8 +368,7 @@ sub do_cisco_switch {
     $cbs = $host_ostype =~ /cbs$/;
     $twenty = $host_ostype =~ /twenty$/;
     $fifty = $host_ostype =~ /fifty$/;
-    $confheader = $host_ostype =~ /hdr/;
-    # print "hostname $hostname, cbs $cbs, twenty $twenty, fifty $fifty, confheader $confheader\n";
+    # print "hostname $hostname, cbs $cbs, twenty $twenty, fifty $fifty\n";
 
 
     my $template = $orig_template;
@@ -380,13 +379,9 @@ sub do_cisco_switch {
     $header = "";
     if ($twenty) {
 	$header = "config-file-header\n$hostname\nv1.2.1.5\nCLI v1.0\n@\n";
-    } elsif ($confheader) {
-	$header = "config-file-header\n$hostname\nv2.4.5.71 / RTESLA2.4.5_930_181_144\nCLI v1.0\nfile SSD indicator excluded\n@\n!\nunit-type-control-start\nunit-type unit 1 network gi uplink none\nunit-type-control-end\n!\n";
     }
     $template =~ s/HEADER\n/$header/;
-    if (0 && $header) {
-	print "Header for $hostname:\n$header";
-    }
+    # print "Header for $hostname:\n$header";
 
     #
     # Create vlan database command
@@ -849,14 +844,13 @@ sub do_switch {
 		#
 		$portvlan{"$port:$2"} = $1;
 
-		# Was "given"
-		for ("$1$usage") {
-		    # First for unused so far
-		    when (/^.$/) { $usage = $_; }
-		    when (/^ut$/)    { $usage = "u"; }
-		    when (/^(a.|uu|[ut]a)$/) {
-			die "port $port misconfigured";
-		    }
+		my $temp="$1$usage";
+		if ($temp =~ /^.$/) {
+		    $usage = $temp;
+		} elsif ($temp eq "ut") {
+		    $usage = "u";
+		} elsif ($temp =~ /^(a.|uu|[ut]a)$/) {
+		    die "port $port misconfigured";
 		}
 	    }
 	}

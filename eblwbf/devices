@@ -20,6 +20,7 @@ bc17p 17 cisco sg200-26p VeldhoITRoom
 bc18p 18 cisco sg300-28pp alltrunk
 bc19p 19 cisco sg300-28pp alltrunk
 bc20p 20 cisco sg300-28p alltrunk
+bc25p 25 cisco sg250-50p alltrunk
 #
 # Black Cisco No POE
 #
@@ -89,6 +90,6 @@ wc88p 88 cisco cbs250-8pp HerningRegistration
 #
 # From 90 on other devices
 #
-# 90 management?
+# 90 Unifi controller
 # 93 Omada controller
-# 95 Unifi controller?
+# 95 management
