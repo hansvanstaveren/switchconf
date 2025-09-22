@@ -89,6 +89,8 @@ sub do_fs_switch {
     $config_str .= "!\n";
 
     $config_str .= "hostname $hostname\n";
+    $logcmd = $log_server ? "logging $log_server" : "";
+    $config_str .= "$logcmd\n";
     $config_str .= "ddm enable\n";
     $config_str .= "!\n";
 
@@ -571,6 +573,13 @@ sub do_cisco_switch {
     $template =~ s/HOSTNAME\n/$hostcmd\n/;
 
     #
+    # Logging
+    #
+
+    $logcmd = $log_server ? "logging host $log_server\nlogging origin-id hostname" : "";
+    $template =~ s/LOGGING\n/$logcmd\n/;
+
+    #
     # privilege used to be "level"
     # For older catalyst switches password MUST be last option!
     #
@@ -594,7 +603,7 @@ sub do_cisco_switch {
 
     # $sshserver = ($layer3 || $fifty)  && !$catalyst ? "ip ssh server\nip ssh password-auth\nip telnet server\n" : "";
     $sshserver = $layer3 && !$catalyst ? "ip ssh server\nip ssh password-auth\nip telnet server\n" : "";
-    $sshserver = "ip ssh server\nip telnet server\n" if ($twenty);
+    $sshserver = "ip ssh server\nip telnet server\n" if ($twenty || $fifty);
     $template =~ s/SSHSERVER\n/$sshserver/;
 
     if ($simple) {
@@ -931,6 +940,7 @@ IFDEFS
 VOICE
 VLANDEFS
 HOSTNAME
+LOGGING
 USERNAME
 SSHSERVER
 SNMP
@@ -1034,7 +1044,8 @@ while(<COMMON>) {
 	next;
     }
     if ($keyw eq "logserver") {
-	$log_server = $rest;
+	$log_server = $rest[0];
+	print "send logging to $log_server\n";
 	next;
     }
     die "$keyw not recognized";

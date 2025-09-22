@@ -34,6 +34,8 @@ bc32n 32 cisco sg200-18 lovebridge16
 bc33n 33 cisco sg300-20 StrasbFotis
 bc34n 34 cisco sg200-26 StrasbGeorgi stp:off
 # Hans
+bc36p 36 cisco sg500-28p alltrunk
+bc37p 37 cisco sf200-24fp alltrunk
 bc38n 38 cisco sg300-10 alltrunk
 bc39n 39 cisco sg250-18 alltrunk
 #
@@ -65,6 +67,9 @@ fs50p 50 fs s3150 alltrunk
 ls51p 51 cisco lgs308mp alltrunk1ap
 ls52p 52 cisco lgs308mp alltrunk1ap
 ls53p 53 cisco lgs308mp alltrunk
+# Hans
+fs58p 58 fs s3150 alltrunk
+fs59p 59 fs s3150 alltrunk
 #
 # White Cisco's POE in
 #
