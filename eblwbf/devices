@@ -20,6 +20,7 @@ bc17p 17 cisco sg200-26p VeldhoITRoom
 bc18p 18 cisco sg300-28pp alltrunk
 bc19p 19 cisco sg300-28pp alltrunk
 bc20p 20 cisco sg300-28p alltrunk
+bc21p 21 cisco sg350-28p alltrunk
 bc25p 25 cisco sg250-50p alltrunk
 #
 # Black Cisco No POE
@@ -59,8 +60,8 @@ fs46p 46 fs s1150 tv
 fs47p 47 fs s1150 tv
 fs48p 48 fs s1150 tv
 # Hans
-fs49p 49 fs s3150 alltrunk
-fs50p 50 fs s3150 alltrunk
+fs49p 49 fs s3150 home2
+fs50p 50 fs s3150 home
 #
 # Next group will probably remain unused, but they work
 #
@@ -68,8 +69,8 @@ ls51p 51 cisco lgs308mp alltrunk1ap
 ls52p 52 cisco lgs308mp alltrunk1ap
 ls53p 53 cisco lgs308mp alltrunk
 # Hans
-fs58p 58 fs s3150 alltrunk
-fs59p 59 fs s3150 alltrunk
+fs58p 58 fs s3150 meterkast
+fs59p 59 fs s3150 home
 #
 # White Cisco's POE in
 #
@@ -96,5 +97,6 @@ wc88p 88 cisco cbs250-8pp HerningRegistration
 # From 90 on other devices
 #
 # 90 Unifi controller
-# 93 Omada controller
+# 92 Omada controller
+# 93 Omada controller (backup)
 # 95 management

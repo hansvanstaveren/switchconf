@@ -23,7 +23,7 @@ vlan 5 GUEST
 vlan 6 LOVEBRIDGE
 vlan 7 SCORING2BE
 vlan 8 GATEWAY2
-vlan 9 SPARE4
+vlan 9 HOME
 #
 # Extra VLAN's, not trunked
 #

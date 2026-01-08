@@ -51,6 +51,7 @@ type cisco sg300-28p 0 28 layer3poe
 type cisco sg300-28mp 0 28 layer3poe
 type cisco sg300-28pp 0 28 layer3poe
 type cisco sg300-sf 0 10 layer3
+type cisco sg350-28p 0 28 layer3poefifty
 type cisco sg500-28p 0 28 layer3xpoe
 #
 # fs.com switches
