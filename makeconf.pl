@@ -888,7 +888,7 @@ sub do_switch {
 	}
     }
 
-    my $stmode = $spanningtreemode;
+    my $stmode = $spanningtreemode;		# Save mode just in case
     if ($host_flags =~ /stp:off/) {
 	$spanningtreemode = "off";
     }
@@ -899,9 +899,11 @@ sub do_switch {
 	$resulting_conf = do_fs_switch($hostname, $devindex, $dt);
     } elsif ($dm eq "tp-link") {
 	$resulting_conf = do_tplink_switch($hostname, $devindex, $dt);
+    } else {
+	die "Switch brand $dm not implemented";
     }
 
-    $spanningtreemode = $stmode;
+    $spanningtreemode = $stmode;		# Restore to original value
 
     if ($ferrors) {
 	unlink($outfile);
