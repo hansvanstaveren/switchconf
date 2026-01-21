@@ -703,10 +703,33 @@ sub do_switch {
     # set up some data based on name and type
     $host_ip = $dev_netaddr{$hostname};
     $host_network = $networks{$dev_netname{$hostname}};
+    $host_vlanbase =  $dev_vlanbase{$hostname};
     $host_flags = $dev_flags{$hostname};
     $host_int{"fa"} = $hw_fa{$devindex};
     $host_int{"gi"} = $hw_gi{$devindex};
     $host_ostype = $hw_os{$devindex};
+
+    undef %vlan_name;
+    undef %synonym;
+    for my $vlandef (@vlans) {
+	my ($vl_number, $vl_name) = split(/:/, $vlandef);
+	$vl_number += $host_vlanbase;
+	$vlan_name{$vl_number} = $vl_name;
+	$synonym{lc $vl_name} = "a$vl_number";
+    }
+    for my $aliasdef (@aliases) {
+	my ($aliasname, $aliasvalue) = split(/:/, $aliasdef);
+	my $astr = "";
+	for $part (split/([0-9]+)/, $aliasvalue) {
+	    if ($part =~ /^[0-9]+$/) {
+		$part += $host_vlanbase;
+	    }
+	    $astr .= $part;
+	}
+	$synonym{lc $aliasname} = $astr;
+    }
+
+    $mainvlanid = $template_mainvlanid + $host_vlanbase;
 
     if ($hw_fa{$devindex} eq "") {
 	file_error($hostname, $ifile, "unknown type $devindex");
@@ -989,9 +1012,7 @@ while(<COMMON>) {
 	next;
     }
     if ($keyw eq "vlan") {
-	$rest[0] += $vlanbase;
-	$vlan_name{$rest[0]} = $rest[1];
-	$synonym{lc $rest[1]} = "a$rest[0]";
+	push (@vlans, "$rest[0]:$rest[1]");
 	next;
     }
     if ($keyw eq "network") {
@@ -1011,18 +1032,11 @@ while(<COMMON>) {
 	next;
     }
     if ($keyw eq "adminvlan") {
-	$mainvlanid = $rest[0]+$vlanbase;
+	$template_mainvlanid = $rest[0];
 	next;
     }
     if ($keyw eq "alias") {
-	my $astr = "";
-	for $part (split/([0-9]+)/, $rest[1]) {
-	    if ($part =~ /^[0-9]+$/) {
-		$part += $vlanbase;
-	    }
-	    $astr .= $part;
-	}
-	$synonym{lc $rest[0]} = $astr;
+	push (@aliases, "$rest[0]:$rest[1]");
 	next;
     }
     if ($keyw eq "spanningtree") {
@@ -1058,13 +1072,19 @@ open(DEVFILE, "<:crlf", $file_devices) || die "Cannot open \"$file_devices\"";
 my (%name_use);
 my (%addr_use);
 while(<DEVFILE>) {
+    my $dev_vlan_base = $vlanbase;
 
     chomp;
     s/\s*#.*//;
     next if /^$/;
 
+    if (s/^vb([0-9]+)\s+//) {
+	$dev_vlan_base = $1;
+    }
+
     my ($name, $addr, $manuf, $type, $ifile, $flags) = split;
     # print "$name has ip-addr $addr and is a $manuf $type switch, conf on $ifile, flags $flags\n";
+    # print "$name vlanbase $dev_vlan_base\n";
     if ($name_use{$name}) {
 	die "Illegal re-use of name $name";
     }
@@ -1091,6 +1111,7 @@ while(<DEVFILE>) {
 
     $dev_netname{$name} = $netname;
     $dev_netaddr{$name} = $netaddr;
+    $dev_vlanbase{$name} = $dev_vlan_base;
     $dev_manuf{$name} = $manuf;
     $dev_type{$name} = $type;
     $dev_conf{$name} = $ifile;

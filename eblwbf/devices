@@ -47,7 +47,7 @@ bc39n 39 cisco sg250-18 alltrunk
 #
 # "Gino" switch
 #
-bc40f 40 cisco sg300-sf alltrunk
+vb420 bc40f 40 cisco sg300-sf alltrunk
 #
 # FS 8-port POE switches
 #
