@@ -62,3 +62,5 @@ type fs s3150 0 10 fs
 # Tp-link, experimental
 #
 type tp-link tl-sg2210p 0 10 tp-link
+type tp-link tl-sg3424p 0 28 tp-link
+type tp-link t2600g-28mps 0 28 tp-link
