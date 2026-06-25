@@ -1,0 +1,4 @@
+port fa1- trunk
+port gi1-7 trunk
+port gi8 scoring
+port gi9-10 trunk

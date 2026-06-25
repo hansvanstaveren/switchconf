@@ -1,0 +1,4 @@
+port gi1-6 172
+port gi7 u9,t172,t174,t175,t176,t73
+port gi8 u170,t171-179,t9,t73
+port gi9-10 trunk
