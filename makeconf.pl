@@ -170,7 +170,7 @@ sub do_fs_switch {
 		# Port not defined, shutdown and warn
 		#
 		$config_str .= " shutdown\n";
-		print "Warning: interface $port not active!\n";
+		print "Warning: interface $hostname/$port not active!\n";
 	    } elsif ($usage =~ /^a(.*)$/) {
 		# Single access port
 		$config_str .= " switchport pvid $1\n";
@@ -286,7 +286,7 @@ sub do_tplink_switch {
 		# Port not defined, shutdown and warn
 		#
 		$config_str .= " shutdown\n";
-		print "Warning: interface $port not active!\n";
+		print "Warning: interface $hostname/$port not active!\n";
 	    } elsif ($usage =~ /^a(.*)$/) {
 		# Single access port
 		$config_str .= " switchport pvid $1\n";
@@ -493,7 +493,7 @@ sub do_cisco_switch {
 		# Port not defined, shutdown and warn
 		#
 		$ifdefs .= "shutdown\n";
-		print "Warning: interface $port not active!\n";
+		print "Warning: interface $hostname/$port not active!\n";
 	    } else {
 		my $portmode = "";
 
