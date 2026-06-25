@@ -820,8 +820,8 @@ sub do_switch {
 	    
 	    for ($low..$high) {
 		unless (defined($vlan_name{$_})) {
-		    file_error($hostname, $ifile, "vlan $_ does not exist");
-		    next;
+		    #  file_error($hostname, $ifile, "vlan $_ does not exist");
+		    # next;
 		}
 		push(@vlanids, "$let$_");
 		if ($let eq "a") {

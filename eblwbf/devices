@@ -53,7 +53,7 @@ vb420 bc40f 40 cisco sg300-sf alltrunk
 #
 fs41p 41 fs s1150 tv
 fs42p 42 fs s1150 tv
-fs43p 43 fs s1150 tv
+fs43p 43 fs s1150 alltrunk
 fs44p 44 fs s1150 tv
 fs45p 45 fs s1150 tv
 fs46p 46 fs s1150 tv
@@ -78,10 +78,10 @@ wc71i 71 cisco cbs250-8t-d scoring7
 wc72i 72 cisco cbs250-8t-d scoring6pluscare
 wc73i 73 cisco cbs250-8t-d scoring7
 wc74i 74 cisco cbs250-8t-d HernBboScoCare
-wc75i 75 cisco cbs250-8t-d HernBboScoCare
+wc75i 75 cisco cbs250-8t-d scoring7
 wc76i 76 cisco cbs250-8t-d StrasbScoring
 wc77i 77 cisco cbs250-8t-d scoring7
-wc78i 78 cisco cbs250-8t-d scoring7
+wc78i 78 cisco cbs250-8t-d scoring4
 #
 # White Cisco's with POE
 #
@@ -89,10 +89,10 @@ wc81p 81 cisco cbs250-8pp alltrunk
 wc82p 82 cisco cbs250-8pp HernVuegraph
 wc83p 83 cisco cbs250-8pp allscoring6
 wc84p 84 cisco cbs250-8pp HerningRegistration
-wc85p 85 cisco cbs250-8pp scoring1aptrunk
-wc86p 86 cisco cbs250-8pp HerningRegistration
+wc85p 85 cisco cbs250-8pp alltrunk
+wc86p 86 cisco cbs250-8pp HernLovebridge
 wc87p 87 cisco cbs250-8pp HernLovebridge
-wc88p 88 cisco cbs250-8pp HerningRegistration
+wc88p 88 cisco cbs250-8pp alltrunk-8
 #
 # From 90 on other devices
 #
