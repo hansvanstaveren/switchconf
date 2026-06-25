@@ -20,18 +20,18 @@ bc17p 17 cisco sg200-26p VeldhoITRoom
 bc18p 18 cisco sg300-28pp alltrunk
 bc19p 19 cisco sg300-28pp alltrunk
 bc20p 20 cisco sg300-28p alltrunk
-bc21p 21 cisco sg350-28p alltrunk
+bc21p 21 cisco sg350-28p VeldhoITRoom
 bc25p 25 cisco sg250-50p alltrunk
 #
 # Black Cisco No POE
 #
 bc26n 26 cisco sg250-26 scoring24
 bc27n 27 cisco sg300-20 HernBboScoring
-bc28n 28 cisco sg300-20 allguest
+bc28n 28 cisco sg300-20 guest8
 bc29n 29 cisco sg200-18 HuezTraian
 bc30n 30 cisco sg200-26 HernBBReg
 bc31n 31 cisco sg200-26 alltrunk
-bc32n 32 cisco sg200-18 lovebridge16
+bc32n 32 cisco sg200-18 lovebridge8
 bc33n 33 cisco sg300-20 StrasbFotis
 bc34n 34 cisco sg200-26 StrasbGeorgi stp:off
 # Hans
@@ -57,7 +57,7 @@ fs43p 43 fs s1150 alltrunk
 fs44p 44 fs s1150 tv
 fs45p 45 fs s1150 tv
 fs46p 46 fs s1150 tv
-fs47p 47 fs s1150 tv
+fs47p 47 fs s1150 milos
 fs48p 48 fs s1150 tv
 # Hans
 fs49p 49 fs s3150 home2

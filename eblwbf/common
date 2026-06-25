@@ -40,6 +40,8 @@ logserver 172.16.0.95
 alias trunk u0,t1-9
 alias aptrunk u0,t2,t4,t6
 alias extwifitrunk t2,t4,t5,t6
+alias milostrunk u14,t0-9
+alias sharedtrunk u0,t1-9,t14
 
 # off, on or smart
 spanningtree on
